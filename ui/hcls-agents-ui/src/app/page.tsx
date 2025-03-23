@@ -95,7 +95,24 @@ export default function Home() {
             </div>
             <div className="mt-6 flex justify-center gap-4">
               <a href="register.html" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Register New Agent</a>
-              <a href="chat.html" className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 ${selectedAgents.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={(e) => selectedAgents.length === 0 && e.preventDefault()}>Start Chat with Selected</a>
+              <a
+                href="/chat"
+                className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 ${
+                  selectedAgents.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={(e) => {
+                  if (selectedAgents.length === 0) {
+                    e.preventDefault();
+                    return;
+                  }
+
+                  const agentData = agents.filter(agent => selectedAgents.includes(agent.id));
+                  localStorage.setItem('selectedAgents', JSON.stringify(agentData));
+                }}
+              >
+                Start Chat with Selected
+              </a>
+
             </div>
           </main>
         </div>
