@@ -32,11 +32,14 @@ async function getAgentDetails(agentId: string, agentArn: string) {
     try {
       const command = new GetAgentCommand({ agentId });
       const response = await client.send(command);
+
+      console.log("Fetched Agent details :", response);
+
       return {
         id: response.agent.agentId,
+        arn:response.agent.agentArn,
         name: response.agent.agentName,
         description: response.agent.description || "No description available.",
-        version: response.agent.agentVersion,
         foundationModel: response.agent.foundationModel || "N/A",
         orchestrationType: response.agent.orchestrationType || "Default",
         createdAt: response.agent.createdAt ? response.agent.createdAt.toISOString() : "N/A",

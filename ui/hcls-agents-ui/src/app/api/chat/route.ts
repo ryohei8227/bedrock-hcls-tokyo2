@@ -1,10 +1,78 @@
-export async function POST(req: Request) {
-  const { message, agents } = await req.json();
+import { NextResponse } from 'next/server';
+import { BedrockAgentRuntimeClient, InvokeInlineAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime";
 
-  const agentNames = agents.map((a: any) => a.name).join(', ');
-  const reply = `🤖 [${agentNames}] have processed your message: "${message}". Here's their collective insight.`;
+const REGION = "us-west-2"; 
 
-  const trace = `Trace:\n- Involved agents: ${agentNames}\n- Message received: "${message}"\n- Simulated reasoning path...`;
+const client = new BedrockAgentRuntimeClient({ region: REGION });
 
-  return Response.json({ reply, trace });
+export async function invokeInlineAgentHelper(requestParams, traceLevel = "core") {
+  try {
+    const input = {
+      ...requestParams
+    };
+
+    const command = new InvokeInlineAgentCommand(input);
+    const response = await client.send(command);
+
+    return response;
+  } catch (error) {
+    console.error("Error invoking inline agent:", error);
+    throw error;
+  }
+}
+
+export async function POST(req) {
+  try {
+    const { message, agents, agent_instruction } = await req.json();
+
+    console.log("Agents:", agents);
+    console.log("Instruction:", agent_instruction);
+
+    const foundationModel = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
+    const sessionId = `session-${Date.now()}`;
+
+    const requestParams = {
+      foundationModel,
+      instruction: agent_instruction,
+      sessionId,
+      endSession: false,
+      enableTrace: true,
+      agentCollaboration: "SUPERVISOR_ROUTER",
+      inputText: message,
+      collaboratorConfigurations: agents.map(agent => ({
+        collaboratorName: agent.name,
+        collaboratorInstruction: agent_instruction,
+        agentAliasArn: "arn:aws:bedrock:us-west-2:048051882663:agent-alias/TVCHAGLT3O/YFH2RJISEM",
+        relayConversationHistory: "TO_COLLABORATOR"
+      }))
+    };
+
+    const result = await invokeInlineAgentHelper(requestParams);
+
+    const agentNames = agents.map((a) => a.name).join(', ');
+    let reply = "";
+    let trace = "";
+
+    for await (const event of result.completion) {
+      if (event.chunk?.bytes) {
+        reply += Buffer.from(event.chunk.bytes).toString("utf-8");
+      }
+      if (event.trace?.trace?.orchestrationTrace) {
+        trace += JSON.stringify(event.trace.trace.orchestrationTrace, null, 2);
+      }
+    }
+
+    console.log("*************************")
+    console.log(reply)
+
+    return new Response(JSON.stringify({ reply, trace }), {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      status: 200
+    });
+  } catch (err) {
+    console.error("POST /invoke-inline-agent error:", err);
+    return NextResponse.json({ error: "Failed to complete the chat message." }, { status: 500 });
+  }
 }

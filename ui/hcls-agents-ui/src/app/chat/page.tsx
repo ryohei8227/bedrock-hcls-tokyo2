@@ -8,6 +8,7 @@ export default function ChatPage() {
   const [selectedAgents, setSelectedAgents] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [instruction, setInstruction] = useState('You are a medical research assistant AI specializing in cancer biomarker analysis and discovery. Coordinate sub-agents to fulfill user questions.');
   const [activeTrace, setActiveTrace] = useState(null);
   const messagesEndRef = useRef(null);
 
@@ -26,7 +27,7 @@ export default function ChatPage() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, agents: selectedAgents })
+        body: JSON.stringify({ message: input, agents: selectedAgents, agent_instruction: instruction })
       });
       const data = await res.json();
       const reply = {
@@ -49,6 +50,10 @@ export default function ChatPage() {
     const stored = localStorage.getItem('selectedAgents');
     if (stored) {
       setSelectedAgents(JSON.parse(stored));
+    }
+    const storedInstruction = localStorage.getItem('agent_instruction');
+    if (storedInstruction) {
+      setInstruction(storedInstruction);
     }
     const storedMessages = localStorage.getItem('chatMessages');
     if (storedMessages) {
@@ -77,11 +82,33 @@ export default function ChatPage() {
               </div>
             ))}
           </div>
+
           <div className="mt-4">
-            <a href="/" className="block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded shadow w-full">← Back to Catalog</a>
+            <button
+              onClick={() => {
+                setMessages([]);
+                localStorage.removeItem('chatMessages');
+              }}
+              className="w-full text-center bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md font-semibold transition duration-200 mb-3"
+            >
+              🗑️ Clear Chat
+            </button>
+            <a href="/" className="block text-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white py-2 px-4 rounded-lg shadow-lg font-semibold tracking-wide transition-all duration-300 ease-in-out w-full">← Back to Catalog</a>
           </div>
         </aside>
         <main className="flex flex-1 flex-col bg-white rounded shadow">
+          <div className="p-2 border-b text-right text-xs text-gray-500">
+            <details>
+              <summary className="cursor-pointer underline inline-block">Edit Agent Instructions</summary>
+              <textarea
+                className="w-full border border-gray-300 rounded p-2 mt-2"
+                placeholder="Enter shared instruction for agent collaboration..."
+                value={instruction}
+                onChange={(e) => setInstruction(e.target.value)}
+                rows={3}
+              />
+            </details>
+          </div>
           <div className="flex-1 p-4 overflow-y-auto" id="chat-messages">
             {messages.map((msg, index) => (
               <div key={index} className="mb-4">

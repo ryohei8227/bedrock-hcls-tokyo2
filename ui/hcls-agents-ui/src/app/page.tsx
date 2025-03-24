@@ -1,3 +1,4 @@
+
 "use client";
 
 import Head from 'next/head';
@@ -35,11 +36,17 @@ export default function Home() {
     fetchAgents();
   }, []);
 
-  const toggleAgentSelection = (agentId) => {
-    setSelectedAgents(prev => 
-      prev.includes(agentId) ? prev.filter(id => id !== agentId) : [...prev, agentId]
-    );
+  const toggleAgentSelection = (agent) => {
+    setSelectedAgents((prev) => {
+      const isAlreadySelected = prev.find((a) => a.id === agent.id);
+      if (isAlreadySelected) {
+        return prev.filter((a) => a.id !== agent.id);
+      } else {
+        return [...prev, agent];
+      }
+    });
   };
+  
 
   const handleCardClick = (e, agent) => {
     // Prevent selection toggle from triggering card expansion
@@ -75,7 +82,15 @@ export default function Home() {
                 .filter(agent => agent.name.toLowerCase().includes(search.toLowerCase()) && (selectedCategory === 'All' || agent.category === selectedCategory))
                 .map((agent) => (
                   <div key={agent.id} className="bg-white p-6 shadow-lg rounded-lg flex items-center cursor-pointer transition transform hover:scale-105 hover:shadow-2xl border border-gray-200" onClick={(e) => handleCardClick(e, agent)}>
-                    <input type="checkbox" className="mr-4" checked={selectedAgents.includes(agent.id)} onChange={() => toggleAgentSelection(agent.id)} />
+                    <input
+  type="checkbox"
+  className="mr-4"
+  checked={selectedAgents.some((a) => a.id === agent.id)}
+  onChange={(e) => {
+    e.stopPropagation();
+    toggleAgentSelection(agent);
+  }}
+/>
                     <img src={agent.image} alt="Agent Icon" className="w-20 h-20 mr-6 rounded-full border-2 border-blue-500 shadow-lg" />
                     <div>
                       <h3 className="font-bold text-lg text-gray-900">{agent.name}</h3>
@@ -106,7 +121,7 @@ export default function Home() {
                     return;
                   }
 
-                  const agentData = agents.filter(agent => selectedAgents.includes(agent.id));
+                  const agentData = selectedAgents;
                   localStorage.setItem('selectedAgents', JSON.stringify(agentData));
                 }}
               >
@@ -131,12 +146,10 @@ export default function Home() {
             <div className="p-4 bg-gray-100 rounded-lg">
               <h3 className="font-bold text-md text-gray-800">Details</h3>
               <ul className="text-sm text-gray-700 mt-2 space-y-1">
-                <li><strong>Agent ID:</strong> {selectedAgent.agentId}</li>
-                <li><strong>ARN:</strong> {selectedAgent.agentArn}</li>
+                <li><strong>Agent ID:</strong> {selectedAgent.id}</li>
+                <li><strong>ARN:</strong> {selectedAgent.arn}</li>
                 <li><strong>Collaboration:</strong> {selectedAgent.agentCollaboration}</li>
                 <li><strong>Status:</strong> {selectedAgent.agentStatus}</li>
-                <li><strong>Client Token:</strong> {selectedAgent.clientToken}</li>
-                <li><strong>Version:</strong> {selectedAgent.version}</li>
                 <li><strong>Foundation Model:</strong> {selectedAgent.foundationModel}</li>
                 <li><strong>Orchestration Type:</strong> {selectedAgent.orchestrationType}</li>
                 <li><strong>Instruction:</strong> {selectedAgent.instruction}</li>
