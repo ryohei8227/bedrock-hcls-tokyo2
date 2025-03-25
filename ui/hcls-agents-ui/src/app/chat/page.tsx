@@ -10,6 +10,7 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [instruction, setInstruction] = useState('You are a medical research assistant AI specializing in cancer biomarker analysis and discovery. Coordinate sub-agents to fulfill user questions.');
   const [activeTrace, setActiveTrace] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const messagesEndRef = useRef(null);
 
   const formatTime = (timestamp) => {
@@ -22,6 +23,7 @@ export default function ChatPage() {
     const userMessage = { sender: 'You', text: input, timestamp };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
+    setIsProcessing(true);
 
     try {
       const res = await fetch('/api/chat', {
@@ -39,6 +41,8 @@ export default function ChatPage() {
       setMessages(prev => [...prev, reply]);
     } catch (err) {
       console.error('Failed to get AI response', err);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -126,6 +130,15 @@ export default function ChatPage() {
                 )}
               </div>
             ))}
+            {isProcessing && (
+              <div className="flex items-center text-sm text-gray-500 animate-pulse">
+                <svg className="w-4 h-4 mr-2 animate-spin text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 11-8 8z"></path>
+                </svg>
+                Waiting for response...
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
           <div className="border-t border-gray-200 p-3 flex">

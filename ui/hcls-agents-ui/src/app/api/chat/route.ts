@@ -1,9 +1,40 @@
 import { NextResponse } from 'next/server';
-import { BedrockAgentRuntimeClient, InvokeInlineAgentCommand } from "@aws-sdk/client-bedrock-agent-runtime";
+import { 
+  BedrockAgentRuntimeClient, 
+  InvokeInlineAgentCommand 
+} from "@aws-sdk/client-bedrock-agent-runtime";
+import { 
+  BedrockAgentClient, 
+  ListAgentAliasesCommand,
+  GetAgentAliasCommand
+} from "@aws-sdk/client-bedrock-agent";
 
 const REGION = "us-west-2"; 
 
-const client = new BedrockAgentRuntimeClient({ region: REGION });
+const runtimeClient = new BedrockAgentRuntimeClient({ region: REGION });
+const controlClient = new BedrockAgentClient({ region: REGION });
+
+export async function getAgentAliasArnByName(agentId) {
+  try {
+    const listCommand = new ListAgentAliasesCommand({ agentId });
+    const listResponse = await controlClient.send(listCommand);
+    const latestAlias = listResponse.agentAliasSummaries?.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+    if (!latestAlias) {
+      console.warn(`No aliases found for agentId: ${agentId}`);
+      return null;
+    }
+
+    const getCommand = new GetAgentAliasCommand({
+      agentId,
+      agentAliasId: latestAlias.agentAliasId
+    });
+    const getResponse = await controlClient.send(getCommand);
+    return getResponse.agentAlias?.agentAliasArn;
+  } catch (error) {
+    console.error(`Error fetching alias ARN for agent ${agentId}:`, error);
+    return null;
+  }
+}
 
 export async function invokeInlineAgentHelper(requestParams, traceLevel = "core") {
   try {
@@ -12,7 +43,7 @@ export async function invokeInlineAgentHelper(requestParams, traceLevel = "core"
     };
 
     const command = new InvokeInlineAgentCommand(input);
-    const response = await client.send(command);
+    const response = await runtimeClient.send(command);
 
     return response;
   } catch (error) {
@@ -31,6 +62,18 @@ export async function POST(req) {
     const foundationModel = "us.anthropic.claude-3-5-sonnet-20241022-v2:0";
     const sessionId = `session-${Date.now()}`;
 
+    const collaboratorConfigurations = await Promise.all(
+      agents.map(async (agent) => {
+        const agentAliasArn = await getAgentAliasArnByName(agent.id || agent.name);
+        return {
+          collaboratorName: agent.name,
+          collaboratorInstruction: agent_instruction,
+          agentAliasArn,
+          relayConversationHistory: "TO_COLLABORATOR"
+        };
+      })
+    );
+
     const requestParams = {
       foundationModel,
       instruction: agent_instruction,
@@ -39,12 +82,7 @@ export async function POST(req) {
       enableTrace: true,
       agentCollaboration: "SUPERVISOR_ROUTER",
       inputText: message,
-      collaboratorConfigurations: agents.map(agent => ({
-        collaboratorName: agent.name,
-        collaboratorInstruction: agent_instruction,
-        agentAliasArn: "arn:aws:bedrock:us-west-2:048051882663:agent-alias/TVCHAGLT3O/YFH2RJISEM",
-        relayConversationHistory: "TO_COLLABORATOR"
-      }))
+      collaboratorConfigurations
     };
 
     const result = await invokeInlineAgentHelper(requestParams);
@@ -62,8 +100,8 @@ export async function POST(req) {
       }
     }
 
-    console.log("*************************")
-    console.log(reply)
+    console.log("*************************");
+    console.log(reply);
 
     return new Response(JSON.stringify({ reply, trace }), {
       headers: {
