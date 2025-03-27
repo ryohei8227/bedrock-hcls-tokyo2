@@ -21,6 +21,17 @@ export default function ChatPage() {
     setInput('');
     setIsProcessing(true);
 
+    // Insert placeholder trace message immediately
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: 'HCLS Agentic AI',
+        text: '',
+        trace: [{ type: 'placeholder', text: 'Trace loading...' }],
+        expandTrace: true
+      }
+    ]);
+
     const response = await fetch('/api/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +58,7 @@ export default function ChatPage() {
             setMessages((prev) => {
               const lastMsg = prev[prev.length - 1];
               if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-                return [...prev, { sender: 'HCLS Agentic AI', text: parsed.data, trace: [], expandTrace: true }];
+                return [...prev, { sender: 'HCLS Agentic AI', text: parsed.data, trace: [{ type: 'placeholder', text: 'Trace loading...' }], expandTrace: true }];
               }
               const updated = [...prev];
               updated[updated.length - 1].text += parsed.data;
@@ -64,16 +75,17 @@ export default function ChatPage() {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
               if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-                updated.push({ sender: 'HCLS Agentic AI', text: '', trace: [traceStep], expandTrace: true });
-              } else {
-                const existing = lastMsg.trace || [];
-                const alreadyExists = existing.some(t =>
-                  t.step === traceStep.step &&
-                  t.type === traceStep.type &&
-                  t.text === traceStep.text
-                );
-                if (!alreadyExists) {
-                  lastMsg.trace = [...existing, traceStep];
+              updated.push({ sender: 'HCLS Agentic AI', text: '', trace: [traceStep], expandTrace: true });
+            } else {
+              const existing = lastMsg.trace || [];
+              const alreadyExists = existing.some(t =>
+                t.step === traceStep.step &&
+                t.type === traceStep.type &&
+                t.text === traceStep.text
+              );
+              if (!alreadyExists) {
+                lastMsg.trace = [...existing.filter(t => t.type !== 'placeholder'), traceStep];
+lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
                 }
                 lastMsg.expandTrace = true;
               }
@@ -86,9 +98,10 @@ export default function ChatPage() {
               const updated = [...prev];
               const lastMsg = updated[updated.length - 1];
               if (lastMsg && lastMsg.sender === 'HCLS Agentic AI') {
-                lastMsg.text = parsed.finalMessage || finalText;
-                lastMsg.timestamp = new Date().toISOString();
-                lastMsg.image = parsed.image || null;
+              lastMsg.text = parsed.finalMessage || finalText;
+              lastMsg.timestamp = new Date().toISOString();
+              lastMsg.image = parsed.image || null;
+              lastMsg.trace = (lastMsg.trace || []).filter(t => t.type !== 'placeholder');
                 lastMsg.expandTrace = true;
               }
               return updated;
@@ -198,9 +211,8 @@ export default function ChatPage() {
                               <div><span className="font-semibold">Execution:</span> {step.executionType}</div>
                             </div>
                           )}
-                          {step.type === 'observation' && (
-                            <div className="text-sm"><span className="font-semibold">📝 Observation:</span> {step.text}</div>
-                          )}
+                          {step.type === 'observation' && (<div className="text-sm"><span className="font-semibold">📝 Observation:</span> {step.text}</div>)}
+{step.type === 'placeholder' && (<div className="text-sm italic text-gray-400">⏳ {step.text}</div>)}
                         </div>
                       ))}
                     </div>
