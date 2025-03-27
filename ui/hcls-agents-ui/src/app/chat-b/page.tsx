@@ -2,25 +2,33 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ChatPage() {
   const [selectedAgents, setSelectedAgents] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [instruction, setInstruction] = useState('You are a medical research assistant AI specializing in cancer biomarker analysis and discovery. Coordinate sub-agents to fulfill user questions.');
+  const [activeTraceOpen, setActiveTraceOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeTraceSteps, setActiveTraceSteps] = useState([]);
   const messagesEndRef = useRef(null);
 
-  const formatTime = (timestamp) => new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   const sendMessage = async () => {
+    setActiveTraceSteps([]);
     if (!input.trim()) return;
     const timestamp = new Date().toISOString();
     const userMessage = { sender: 'You', text: input, timestamp };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsProcessing(true);
+    setActiveTraceOpen(true);
 
+    const newTraceSteps = [];
     const response = await fetch('/api/chat/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -30,6 +38,7 @@ export default function ChatPage() {
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
     let finalText = '';
+    let image = null;
     let stepCount = 0;
 
     while (true) {
@@ -38,66 +47,39 @@ export default function ChatPage() {
 
       const chunk = decoder.decode(value);
       chunk.split('\n\n').forEach(line => {
-        if (!line.startsWith('data: ')) return;
-        try {
-          const parsed = JSON.parse(line.replace('data: ', ''));
+        if (line.startsWith('data: ')) {
+          try {
+            const parsed = JSON.parse(line.replace('data: ', ''));
 
-          if (parsed.type === 'chunk') {
-            finalText += parsed.data;
-            setMessages((prev) => {
-              const lastMsg = prev[prev.length - 1];
-              if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-                return [...prev, { sender: 'HCLS Agentic AI', text: parsed.data, trace: [], expandTrace: true }];
-              }
-              const updated = [...prev];
-              updated[updated.length - 1].text += parsed.data;
-              return updated;
-            });
+            if (parsed.type === 'chunk') {
+              finalText += parsed.data;
+            }
+
+            else if (['rationale', 'tool', 'observation', 'agent-collaborator'].includes(parsed.type)) {
+              const step = parsed.step !== undefined ? parsed.step : stepCount + 1;
+              stepCount = step;
+              const traceStep = { ...parsed, step };
+              newTraceSteps.push(traceStep);
+              setActiveTraceSteps((prev) => [...prev, traceStep]);
+            }
+
+            else if (parsed.type === 'end') {
+              image = parsed.image;
+              const reply = {
+                sender: 'HCLS Agentic AI',
+                text: parsed.finalMessage || finalText,
+                timestamp: new Date().toISOString(),
+                trace: newTraceSteps,
+                image: parsed.image || null
+              };
+              setMessages((prev) => [...prev, reply]);
+              setActiveTraceSteps(newTraceSteps);
+              setIsProcessing(false);
+            }
+
+          } catch (e) {
+            console.error('Error parsing SSE:', e);
           }
-
-          else if (['rationale', 'tool', 'observation', 'agent-collaborator'].includes(parsed.type)) {
-            const step = parsed.step !== undefined ? parsed.step : stepCount + 1;
-            stepCount = step;
-            const agent = parsed.agent || parsed.data?.agent || 'unknown-agent';
-            const traceStep = { ...parsed, step, agent };
-            setMessages((prev) => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-                updated.push({ sender: 'HCLS Agentic AI', text: '', trace: [traceStep], expandTrace: true });
-              } else {
-                const existing = lastMsg.trace || [];
-                const alreadyExists = existing.some(t =>
-                  t.step === traceStep.step &&
-                  t.type === traceStep.type &&
-                  t.text === traceStep.text
-                );
-                if (!alreadyExists) {
-                  lastMsg.trace = [...existing, traceStep];
-                }
-                lastMsg.expandTrace = true;
-              }
-              return updated;
-            });
-          }
-
-          else if (parsed.type === 'end') {
-            setMessages((prev) => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (lastMsg && lastMsg.sender === 'HCLS Agentic AI') {
-                lastMsg.text = parsed.finalMessage || finalText;
-                lastMsg.timestamp = new Date().toISOString();
-                lastMsg.image = parsed.image || null;
-                lastMsg.expandTrace = true;
-              }
-              return updated;
-            });
-            setIsProcessing(false);
-          }
-
-        } catch (e) {
-          console.error('Error parsing SSE:', e);
         }
       });
     }
@@ -174,43 +156,25 @@ export default function ChatPage() {
           <div className="flex-1 p-4 overflow-y-auto" id="chat-messages">
             {messages.map((msg, index) => (
               <div key={index} className="mb-4">
+                <p className="mb-1">
+                  <strong>{msg.sender}:</strong> {msg.text}
+                  <span className="ml-2 text-xs text-gray-400">{formatTime(msg.timestamp)}</span>
+                </p>
                 {msg.image && (
                   <div className="mt-2">
                     <Image src={msg.image} alt="Generated Visual" width={400} height={300} className="rounded shadow border" />
                   </div>
                 )}
-                {msg.trace && (
-                  <details open={msg.expandTrace} className="mt-3 border rounded-md bg-gray-50 p-3">
-                    <summary className="cursor-pointer font-semibold text-blue-700">🧵 Trace Steps</summary>
-                    <div className="mt-3 space-y-3">
-                      {msg.trace.map((step, stepIdx) => (
-                        <div key={stepIdx} className="p-3 rounded-lg border bg-white shadow-sm">
-                          <div className="text-sm font-semibold text-blue-700 mb-1">Step {step.step}</div>
-                          {step.type === 'rationale' && (
-                            <div className="text-sm"><span className="font-semibold">💡 Rationale:</span> {step.text}</div>
-                          )}
-                          {step.type === 'agent-collaborator' && (
-                            <div className="text-sm"><span className="font-semibold">👤➡️👤 Agent - {step.agent}:</span> {step.text}</div>
-                          )}
-                          {step.type === 'tool' && (
-                            <div className="text-sm">
-                              <div><span className="font-semibold">🧰 Tool:</span> {step.function || step.apiPath || 'Unknown'}</div>
-                              <div><span className="font-semibold">Execution:</span> {step.executionType}</div>
-                            </div>
-                          )}
-                          {step.type === 'observation' && (
-                            <div className="text-sm"><span className="font-semibold">📝 Observation:</span> {step.text}</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                )}
-                {msg.text && (
-                  <p className="mt-3">
-                    <strong>{msg.sender}:</strong> {msg.text}
-                    <span className="ml-2 text-xs text-gray-400">{formatTime(msg.timestamp)}</span>
-                  </p>
+                {msg.sender === 'HCLS Agentic AI' && msg.trace && (
+                  <button
+                    onClick={() => {
+                      setActiveTraceOpen(true);
+                      setActiveTraceSteps(msg.trace);
+                    }}
+                    className="text-sm px-3 py-1 border border-blue-500 text-blue-600 rounded-full hover:bg-blue-50 transition duration-200 cursor-pointer shadow-sm"
+                  >
+                    View Trace
+                  </button>
                 )}
               </div>
             ))}
@@ -237,6 +201,41 @@ export default function ChatPage() {
             </button>
           </div>
         </main>
+
+        <AnimatePresence>
+          {activeTraceOpen && (
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-0 right-0 w-1/3 h-full bg-white p-6 shadow-2xl border-l-4 border-blue-500 rounded-l-lg overflow-y-auto z-50"
+            >
+              <button
+                className="float-right text-lg font-bold text-gray-600 hover:text-gray-900"
+                onClick={() => setActiveTraceOpen(false)}
+              >
+                ×
+              </button>
+              <h2 className="text-xl font-bold mb-4">Trace Details</h2>
+              {activeTraceSteps.length === 0 && <p className="text-sm text-gray-400 italic">No trace available yet.</p>}
+              {activeTraceSteps.map((step, index) => (
+                <div key={index} className="mb-5 p-4 rounded-lg border border-gray-300 bg-gray-50">
+                  <div className="text-sm mb-1 font-semibold text-blue-700">Step {step.step} — </div>
+                  {step.type === 'rationale' && <div className="text-sm"><span className="font-semibold">💡 Rationale:</span> {step.text}</div>}
+                  {step.type === 'agent-collaborator' && <div className="text-sm"><span className="font-semibold">👤➡️👤 Agent - {step.agent} :</span> {step.text}</div>}
+                  {step.type === 'tool' && (
+                    <div className="text-sm">
+                      <div className="mb-1"><span className="font-semibold">🧰 Tool:</span> {step.function || step.apiPath || 'Unknown'}</div>
+                      <div><span className="font-semibold">Execution:</span> {step.executionType}</div>
+                    </div>
+                  )}
+                  {step.type === 'observation' && <div className="text-sm"><span className="font-semibold">📝 Observation:</span> {step.text}</div>}
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
