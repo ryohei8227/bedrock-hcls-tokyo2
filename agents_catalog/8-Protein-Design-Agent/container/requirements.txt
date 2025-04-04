@@ -1,4 +1,3 @@
-evo_prot_grad==0.2.1
 pandas==2.2.1
 matplotlib
 seaborn

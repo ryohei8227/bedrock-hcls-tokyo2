@@ -1,6 +1,0 @@
-[
-    {
-      "ParameterKey": "S3BucketName",
-      "ParameterValue": "hcls-bedrock-agents-byot-aho"
-    }
-]
