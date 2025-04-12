@@ -35,7 +35,7 @@ def download_guidance_document(anatomical_structure):
     import os
     # Get list of all files in the S3 bucket
     s3 = boto3.client('s3')
-    bucket_name = "vikash-data-subset"
+    bucket_name = "data-for-report-validation"
     response = s3.list_objects_v2(Bucket=bucket_name)
     files = [obj['Key'] for obj in response['Contents']]
 
