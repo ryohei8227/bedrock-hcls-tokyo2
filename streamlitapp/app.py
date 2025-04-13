@@ -465,7 +465,7 @@ questions = [
     "What is the average age of patients diagnosed with Adenocarcinoma",
     "Can you search pubmed for evidence around the effects of biomarker use in oncology on clinical trial failure risk",
     "Can you search pubmed for FDA approved biomarkers for non small cell lung cancer",
-    "Create a bar chart for the top 5 gene biomarkers (e.g.,TP53, BRCA1, EGFR, KRAS, MYC with respect to their prognostic significance in chemotherapy-treated patients.The Y-axis should represent –log10(p-value) from a Cox proportional hazards model assessing association with overall survival. Y-axis values are: 8.3, 6.7, 5.9, 4.2, 3.8",
+    "What is the best gene biomarker (lowest p value) with overall survival for patients that have undergone chemotherapy, graph the top 5 biomarkers in a bar chart",
     "Show me a Kaplan Meier chart for biomarker with name 'gdf15' for chemotherapy patients by grouping expression values less than 10 and greater than 10",
     "According to literature evidence, what metagene cluster does gdf15 belong to",
     "According to literature evidence, what properties of the tumor are associated with metagene 19 activity and EGFR pathway",
