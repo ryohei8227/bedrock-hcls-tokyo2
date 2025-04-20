@@ -1,1 +1,4 @@
 venv/
+.scratch
+agenteval_*
+.DS_Store
