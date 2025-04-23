@@ -15,6 +15,9 @@ Parameters:
   ChartImageBucketName:
     Type: String
     Description: S3 bucket name for storing chart images
+  LayersBucketName:
+    Type: String
+    Description: S3 bucket name for storing Lambda layers
 
 Conditions:
   CreateAgentAliasCondition: !Not [!Equals [!Ref AgentAliasName, ""]]
@@ -105,19 +108,9 @@ Resources:
       CompatibleRuntimes:
         - python3.11
       Content:
-        S3Bucket: !Ref 'AWS::NoValue'  # You'll need to provide this
-        S3Key: !Ref 'AWS::NoValue'      # You'll need to provide this
-
-  AwsSdkPandasLayer:
-    Type: AWS::Lambda::LayerVersion
-    Properties:
-      LayerName: awssdkpandas
-      Description: Layer containing AWS SDK and pandas
-      CompatibleRuntimes:
-        - python3.12
-      Content:
-        S3Bucket: !Ref 'AWS::NoValue'  # You'll need to provide this
-        S3Key: !Ref 'AWS::NoValue'      # You'll need to provide this
+        S3Bucket:
+          Ref: LayersBucketName
+        S3Key: lambdalayers/matplotlib.zip 
 
   #######################
   ##### Lambda Functions #####
@@ -133,7 +126,7 @@ Resources:
       Timeout: 30
       MemorySize: 128
       Layers:
-        - !Ref AwsSdkPandasLayer
+        - Fn::Sub: arn:aws:lambda:${AWS::Region}:336392948345:layer:AWSSDKPandas-Python312:16
       Code: "action_groups/clinical-study-search"
       PackageType: Zip
       Environment:
@@ -176,7 +169,7 @@ Resources:
           ACTION_GROUP: "drug-information-action-group"
           LOG_LEVEL: "DEBUG"
       Layers:
-        - !Ref AwsSdkPandasLayer
+        - !Sub "arn:aws:lambda:${AWS::Region}:336392948345:layer:AWSSDKPandas-Python312:16"
       Code: "action_groups/drug-information"
       PackageType: Zip
 
@@ -369,8 +362,6 @@ Resources:
     Properties:
       AgentId: !GetAtt Agent.AgentId
       AgentAliasName: !Ref AgentAliasName
-      RoutingConfiguration:
-        - AgentVersion: DRAFT
 
 Outputs:
   AgentId:

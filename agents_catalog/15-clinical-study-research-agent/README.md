@@ -35,17 +35,22 @@ The agent is deployed using AWS CloudFormation. The template creates all necessa
 
 ### Deployment Steps
 
-1. Create the necessary Lambda layers for matplotlib and AWS SDK pandas
-2. Deploy the CloudFormation template:
+1. (If needed) Create a Amazon S3 bucket to store the agent template.
+
+`aws s3 mb s3://YOUR_S3_BUCKET_NAME`
+
+2. Navigate to the `15-clinical-study-research-agent` folder.
+
+`cd 15-clinical-study-research-agent`
 
 ```bash
-aws cloudformation deploy \
-  --template-file clinical-study-agent.yaml \
-  --stack-name clinical-study-research-agent \
-  --parameter-overrides \
-    AgentIAMRoleArn=<your-agent-role-arn> \
-    ChartImageBucketName=<your-bucket-name> \
-  --capabilities CAPABILITY_IAM
+export BUCKET_NAME="<REPLACE>"
+export NAME="<REPLACE>"
+export REGION="<REPLACE>"
+export BEDROCK_AGENT_SERVICE_ROLE_ARM="<REPLACE>"
+export IMAGE_BUCKET="<REPLACE>"
+
+bash deploy.sh
 ```
 
 ## Usage Examples
