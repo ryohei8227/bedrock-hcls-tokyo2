@@ -1,12 +1,11 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+import boto3
 import json
 import logging
 import os
 import urllib.parse
 import urllib.request
-
-import boto3
 
 session = boto3.session.Session()
 secrets_manager = session.client(service_name="secretsmanager")
