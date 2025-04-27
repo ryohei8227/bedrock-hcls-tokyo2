@@ -18,7 +18,7 @@ As a prerequisite, you need to have an annotated VCF file in your S3 bucket and 
 The following execution of python script will create an IAM role in your AWS account with a prefix tag of OmicsUnifiedServiceRole [Ex: OmicsUnifiedServiceRole-{ts}]. Please note that this role has broader access to your S3 buckets and container registry. We recommen to modify the IAM policies in the script to meet least-privilege permissions 
 
 %%bash
-python3 omics-workflow.py
+python3 workflows/omics_wf_role.py
 
 ### Bring the VEP container to your Amazon Elastic Container Registry (ECR)
 %%bash
@@ -104,7 +104,11 @@ response = omics.start_run(
 run_vep = response
 response
 
-This process may take about 20 minutes to generate VEP annotated VCF file and summry html available in output bucket defined in 'Running VEP workflow'
+This process may take about 20 minutes to generate VEP annotated VCF file and summary html available in output bucket defined in 'Running VEP workflow'
+##### ******************Github repo reference******************************************###############
+This Github repositoty [https://github.com/aws-samples/aws-healthomics-eventbridge-integration] includes VEP modules for deployment, you may directly deploy this CDK to setup your VEP workflow 
+
+This blog has some detailed event-driven architecture [https://github.com/aws-samples/aws-healthomics-eventbridge-integration] including Healthomics Ready2Run workflow triggers by event and VEP automation for your reference 
 
 ##### *******************************END OF VEP WORKFLOW********************************##############
 

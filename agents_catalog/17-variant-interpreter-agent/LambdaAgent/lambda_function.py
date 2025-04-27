@@ -9,7 +9,7 @@ import gzip
 
 # Environment variables
 REGION = os.environ.get('REGION','us-east-1')
-ACCOUNT_ID = os.environ.get('ACCOUNT_ID','735766051544')
+ACCOUNT_ID = os.environ.get('ACCOUNT_ID','123456789123')
 BUCKET_NAME = os.environ.get('BUCKET_NAME','apj-omics-us')
 MODEL_ID = os.environ.get('MODEL_ID', 'anthropic.claude-3-sonnet-20240229-v1:0')
 modelid = 'anthropic.claude-3-5-sonnet-20240620-v1:0'
