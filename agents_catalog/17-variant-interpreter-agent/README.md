@@ -5,7 +5,112 @@ This repository showcases how to create an agent using Amazon Bedrock to support
 * Analyzing existing VEP-annotated VCFs and providing meaningful interpretation summaries 
 * Retrieving existing VEP-annotated reports and extracting information from parsed PDFs
 
-As a prerequisite, you need to have an annotated VCF file in your S3 bucket and a specific prefix to map with a patient ID (Ex: 3186764). This agent recognizes and understands VEP-annotated VCF files. For a given patient ID, the agent reads and interprets queries related to:
+# Prerequisite:
+
+As a prerequisite, you need to have an annotated VCF file in your S3 bucket and a specific prefix to map with a patient ID (Ex: 3186764). The following prerequisite Healthomics workflows steps need to be run only when you don't have VEP annotated VCF file.
+
+##### *******************************OPTIONAL********************************##############
+
+## How to genegenerate VEP-annotated VCF Files:
+
+### Create an IAM role to run AWS Healthomics workflows
+
+The following execution of python script will create an IAM role in your AWS account with a prefix tag of OmicsUnifiedServiceRole [Ex: OmicsUnifiedServiceRole-{ts}]. Please note that this role has broader access to your S3 buckets and container registry. We recommen to modify the IAM policies in the script to meet least-privilege permissions 
+
+%%bash
+python3 omics-workflow.py
+
+### Bring the VEP container to your Amazon Elastic Container Registry (ECR)
+%%bash
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --output text --query "Account")
+AWS_REGION=$(aws configure get region)
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com 
+aws ecr create-repository \
+    --repository-name ensemblorg/ensembl-vep \
+    --image-scanning-configuration scanOnPush=true \
+    --region ${AWS_REGION} 
+docker pull ensemblorg/ensembl-vep:release_113.4
+docker tag ensemblorg/ensembl-vep:release_113.4 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ensemblorg/ensembl-vep:release_113.4
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ensemblorg/ensembl-vep:release_113.4
+
+### Build VEP workflow in AWS Healthomics environment
+
+definition_uri = "workflows/vep-healthomics.zip"
+parameters = {
+   "vcf": {
+                  "description": "input VCF"
+         },
+         "vep_cache": {
+                  "description": "cache directory to use"
+         },
+         "vep_cache_version": {
+                  "description": "Use a different cache version than the assumed default (the VEP version)."
+         },
+         "vep_species": {
+                  "description": "Species for your data. This can be the latin name e.g. homo_sapiens or any Ensembl alias e.g. mouse"
+         },
+         "ecr_registry": {
+                  "description": "Amazon ECR registry for container images (e.g. '<account-id>.dkr.ecr.<region>.amazonaws.com')",
+                  "optional": false
+         },
+         "vep_genome": {
+                  "description": "Reference Assembly and version for the species, e.g. GRCh38"
+         },
+         "id": {
+                  "description": "Raw input data as a string. May be used, for example, to input a single rsID or HGVS notation quickly to vep. Default: null",
+                  "optional": true
+         }
+}
+
+response = omics.create_workflow(
+    name="ensembl-vep-nf",
+    description="VEP annotation workflow",
+    definitionUri=definition_uri,  
+    main="main.nf",
+    parameterTemplate=parameters,
+)
+
+workflow_vep = response
+
+print(f"waiting for workflow {workflow_vep['id']} to become ACTIVE")
+workflow_gatk = omics.get_workflow(id=workflow_vep['id'])
+while workflow_vep['status'] in ('CREATING', 'UPDATING'):
+    time.sleep(5)
+    workflow_vep = omics.get_workflow(id=workflow_vep['id'])
+
+if workflow_vep['status'] == 'ACTIVE':
+    print(f"workflow {workflow_vep['id']} ready for use")
+else:
+    print(f"workflow {workflow_vep['id']} {workflow_vep['status']}")
+
+### Running VEP workflow
+sample_name='<sample_id>'
+response = omics.start_run(
+    workflowId=workflow_vep['id'],
+    name=f"VEP annotated vcf - {sample_name}",
+    roleArn=OMICS_JOB_ROLE_ARN,
+    parameters={
+        "vcf": "s3://<INPUT_BUCKET>/omics/HCC1395T.mutect2.vcf.gz",
+         "vep_species": "homo_sapiens",
+         "vep_cache": "s3://<INPUT_BUCKET>/omics/sarek/vep_cache/",
+         "vep_cache_version": "113",
+         "ecr_registry": "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com",
+         "vep_genome": "GRCh38",
+         "id": "HCC1395T"
+   },
+    outputUri=f's3://<OMICS_OUTPUT_BUCKET>/output/vep/',
+)
+
+run_vep = response
+response
+
+This process may take about 20 minutes to generate VEP annotated VCF file and summry html available in output bucket defined in 'Running VEP workflow'
+
+##### *******************************END OF VEP WORKFLOW********************************##############
+
+## Agent features 
+
+This agent recognizes and understands VEP-annotated VCF files. For a given patient ID, the agent reads and interprets queries related to:
 
    - Variants per chromosome
    - Impact distribution
