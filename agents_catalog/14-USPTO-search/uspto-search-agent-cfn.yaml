@@ -50,6 +50,8 @@ Resources:
   USPTOSearchLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
+      FunctionName: SearchUSPTO
+      Description: Search for USPTO patent information using { 'search_query' } parameter (e.g. 'Cancer treatment'). Accepts optional { 'days' } parameter, representing the number of days in the past to search (e.g. '100').
       Runtime: python3.13
       Handler: index.lambda_handler
       Role: !GetAtt USPTOSearchLambdaRole.Arn
@@ -62,6 +64,9 @@ Resources:
             - "USPTO_API_KEY_${StackId}"
             - StackId: !Select [2, !Split ["/", !Ref AWS::StackId]]
       Code: "action-groups/uspto-search"
+      Tags:
+        - Key: Application
+          Value: HCLSAgents
 
   USPTOSearchLambdaRole:
     Type: AWS::IAM::Role
@@ -193,11 +198,10 @@ Resources:
           - Type: PROFANITY
 
 Outputs:
-  AgentId: 
+  AgentId:
     Description: Agent ID
     Value: !Ref USPTOSearchAgent
-  AgentAliasId: 
+  AgentAliasId:
     Description: Agent Alias ID
-    Value: !GetAtt  AgentAliasResource.AgentAliasId
+    Value: !GetAtt AgentAliasResource.AgentAliasId
     Condition: CreateAgentAliasCondition
-
