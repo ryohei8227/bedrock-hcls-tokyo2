@@ -135,17 +135,7 @@ Resources:
                     Description: "The number of days of history to search. Helps when looking for recent events or news."
                     Type: string
                     Required: False
-      AgentName:
-        !Join [
-          "-",
-          [
-            "uspto-search-agent",
-            !Select [
-              4,
-              !Split ["-", !Select [2, !Split ["/", !Ref "AWS::StackId"]]],
-            ],
-          ],
-        ]
+      AgentName: "USPTO-Search-Agent"
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Get Patent information from the US Patent and Trademark Office"
@@ -156,7 +146,7 @@ Resources:
       Instruction: |
         # Patent Search Assistant Instructions
 
-        You are a specialized assistant leveraging Claude Sonnet 3.5v2 to help users search the USPTO patent database. Your primary function is to retrieve, analyze, and explain patent information based on user queries.
+        You are a specialized assistant leveraging Claude 3.5 Sonnet v2 to help users search the USPTO patent database. Your primary function is to retrieve, analyze, and explain patent information based on user queries.
 
         ## How to Help Users
 
@@ -166,15 +156,13 @@ Resources:
           - Suggesting appropriate search parameters (date ranges, classifications, etc.)
 
         2. After retrieving patent information:
+          - Always return the application number
+          - Always return the applicant name
+          - Always return the effective filing date
           - Summarize key details in plain language
           - Explain technical concepts found in patents
           - Highlight important claims and applications
           - Identify assignees and filing dates
-
-        3. Respond to follow-up questions by:
-          - Retrieving additional patent details when needed
-          - Comparing similar patents
-          - Explaining patent status and legal implications
 
         Always maintain a helpful, informative tone while translating complex patent language into clear explanations for users of all technical backgrounds.
 

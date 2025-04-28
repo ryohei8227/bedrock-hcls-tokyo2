@@ -23,7 +23,7 @@ FUNCTION_NAMES = []
 SLEEP_AFTER_429 = 0.1
 SLEEP_BETWEEN_HTTP = 0
 HTTP_RETRY = 5
-MAX_FILES = 10
+LIMIT = 25
 total_429 = 0
 total_rate = 0
 
@@ -59,9 +59,8 @@ except Exception as e:
 def uspto_search(
     search_query: str,
     filing_days_in_past: int = None,
-    # search_query: str,
 ) -> str:
-    logger.info(f"executing USPTO search with {urllib.parse.quote(search_query)=}")
+    logger.info(f"executing USPTO search with {urllib.parse.quote(search_query)}")
 
     headers = {
         "Content-Type": "application/json",
@@ -70,11 +69,19 @@ def uspto_search(
     }
     payload = {
         "q": search_query,
+        "sort": [{"field": "applicationMetaData.effectiveFilingDate", "order": "desc"}],
+        "fields": [
+            "applicationNumberText",
+            "applicationMetaData.firstInventorName",
+            "applicationMetaData.effectiveFilingDate",
+            "applicationMetaData.applicationTypeLabelName",
+            "applicationMetaData.firstApplicantName",
+            "applicationMetaData.inventionTitle",
+        ],
+        "pagination": {"offset": 0, "limit": LIMIT},
     }
 
     if filing_days_in_past:
-        # print today's date in YYYY-MM-DD format
-
         end_date = datetime.date.today()
         start_date = end_date - datetime.timedelta(days=int(filing_days_in_past))
         payload["rangeFilters"] = [
@@ -85,29 +92,14 @@ def uspto_search(
             }
         ]
     data = json.dumps(payload).encode("utf-8")
-    logger.info(f"search payload: {data=}")
+    logger.info(f"search payload: {data}")
     request = urllib.request.Request(BASE_URL, data=data, headers=headers)  # nosec: B310 fixed url we want to open
 
     try:
         response = urllib.request.urlopen(request)  # nosec: B310 fixed url we want to open
         response_data: str = response.read().decode("utf-8")
-        response_dict = json.loads(response_data)
-        results = [
-            {
-                "applicationNumber": result["applicationNumberText"],
-                "firstInventorName": result["applicationMetaData"]["firstInventorName"],
-                "effectiveFilingDate": result["applicationMetaData"][
-                    "effectiveFilingDate"
-                ],
-                "applicationType": result["applicationMetaData"][
-                    "applicationTypeLabelName"
-                ],
-                "ApplicantName": result["applicationMetaData"]["firstApplicantName"],
-                "inventionTitle": result["applicationMetaData"]["inventionTitle"],
-            }
-            for result in response_dict["patentFileWrapperDataBag"]
-        ]
-        logger.debug(f"Response from USPTO search {results=}")
+        results = json.loads(response_data)
+        logger.info(f"Response from USPTO search {results}")
         return json.dumps(results, separators=(",", ":"))
     except urllib.error.HTTPError as e:
         logger.error(f"failed to retrieve search results, error: {e.code}")
