@@ -121,7 +121,7 @@ Resources:
                     Description: "Unstructured medical text"
                     Type: string
                     Required: True
-      AgentName: jsl-medical-reasoning
+      AgentName: John-Snow-Labs-Medical-Reasoning
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Use clinical guidelines and structured reasoning patterns to process patient information and recommend next steps."
