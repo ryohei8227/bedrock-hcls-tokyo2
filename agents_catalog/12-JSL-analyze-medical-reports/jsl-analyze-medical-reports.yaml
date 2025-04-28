@@ -7,7 +7,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
@@ -144,7 +144,7 @@ Resources:
                     Description: "Unstructured medical text"
                     Type: string
                     Required: True
-      AgentName: jsl-analyze-medical-reports
+      AgentName: John-Snow-Labs-Analyze-Medical-Reports
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Extract adverse drug events from unstructured clinical texts"

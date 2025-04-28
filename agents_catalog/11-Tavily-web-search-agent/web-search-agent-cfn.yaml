@@ -14,7 +14,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
@@ -143,17 +143,7 @@ Resources:
                     Description: "The number of days of history to search. Helps when looking for recent events or news."
                     Type: string
                     Required: False
-      AgentName:
-        !Join [
-          "-",
-          [
-            "web-search-agent",
-            !Select [
-              4,
-              !Split ["-", !Select [2, !Split ["/", !Ref "AWS::StackId"]]],
-            ],
-          ],
-        ]
+      AgentName: Tavily-Web-Search-Agent
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Answer questions by searching the internet."
