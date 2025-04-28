@@ -65,8 +65,60 @@ Answer questions using information retrieved by the [Wiley Oline Library](https:
   }
 }
 ```
+## 3. Python Installation
+```bash
+python -m venv ./.venv
+source ./.venv/bin/activate
+pip install -r requirements.txt
+python scenario_get_started_with_agents.py
+````
 
-## 3. Installation
+To quit the prompt, type "exit"
+
+# Logs
+
+```bash
+INFO: Found credentials in shared credentials file: ~/.aws/credentials
+========================================================================================
+Welcome to the Amazon Bedrock Agents demo.
+========================================================================================
+Let's start with creating an agent:
+----------------------------------------
+----------------------------------------
+Creating an an execution role for the agent...
+Creating the agent...
+Preparing the agent...
+Creating the Lambda function...
+Creating an execution role for the Lambda function...
+Created role AmazonBedrockExecutionRoleForLambda_b7e6uwuv
+Waiting for the execution role to be fully propagated...
+Creating an action group for the agent...
+Preparing the agent...
+Creating an agent alias...
+----------------------------------------------------------------------------------------
+The agent is ready to chat.
+Try asking for the date or time. Type 'exit' to quit.
+Prompt: what time is it?       
+Agent: The current time is 18:58:08 UTC.
+Prompt: and the current date?   
+Agent: The current date is 2025-04-15.
+Prompt: who is the president of the USA?
+Agent: Sorry, I cannot help you with that.
+Prompt: exit
+========================================================================================
+Thanks for running the demo!
+
+Do you want to delete the created resources? [y/N] y
+Deleting agent alias...
+Deleting agent...
+Deleting function 'AmazonBedrockExampleFunction_b7e6uwuv'...
+Deleting role 'AmazonBedrockExecutionRoleForAgents_b7e6uwuv'...
+Deleting role 'AmazonBedrockExecutionRoleForLambda_b7e6uwuv'...
+========================================================================================
+All demo resources have been deleted. Thanks again for running the demo!
+```
+
+## 4. Cloudformation Installation
 
 1. (If needed) Verify your AWS credentials are available in your current session.
 
