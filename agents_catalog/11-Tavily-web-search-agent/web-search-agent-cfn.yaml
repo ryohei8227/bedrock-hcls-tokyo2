@@ -50,7 +50,9 @@ Resources:
   WebSearchLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.12
+      FunctionName: TavilyWebSearch
+      Description: "Search the web with { 'search_query' } parameter. Optional { 'days' } parameter for days of history to search and { 'topic' } parameter for either 'news' or 'general' content type."
+      Runtime: python3.13
       Handler: index.lambda_handler
       Role: !GetAtt WebSearchLambdaRole.Arn
       Timeout: 30
@@ -62,6 +64,9 @@ Resources:
             - "TAVILY_API_KEY_${StackId}"
             - StackId: !Select [2, !Split ["/", !Ref AWS::StackId]]
       Code: "action-groups/web-search"
+      Tags:
+        - Key: Application
+          Value: HCLSAgents
 
   WebSearchLambdaRole:
     Type: AWS::IAM::Role
@@ -222,11 +227,10 @@ Resources:
           - Type: PROFANITY
 
 Outputs:
-  AgentId: 
+  AgentId:
     Description: Agent ID
     Value: !Ref WebSearchAgent
-  AgentAliasId: 
+  AgentAliasId:
     Description: Agent Alias ID
-    Value: !GetAtt  AgentAliasResource.AgentAliasId
+    Value: !GetAtt AgentAliasResource.AgentAliasId
     Condition: CreateAgentAliasCondition
-
