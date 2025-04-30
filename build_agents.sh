@@ -71,7 +71,7 @@ if [ -d "ui" ]; then
   cd ui || exit
   zip -r ui_artifact.zip . -x "node_modules/*" 
   echo "Uploading React UI artifact to S3..."
-  aws s3 cp "ui_artifact.zip" "s3://${S3_BUCKET}/ui_artifact.zip"
+  aws s3 cp "ui_artifact.zip" "s3://${S3_BUCKET}/ui/ui_artifact.zip"
   echo "React UI artifact uploaded to S3, deleting local copy"
   rm "ui_artifact.zip"
   cd ..
@@ -80,13 +80,7 @@ fi
 # Process react app docker build template
 echo "Processing react app docker build template..."
 if [ -d "ui" ] && [ -f "ui/cloudformation/docker_build_pipeline.yml" ]; then
-  echo "Packaging react app docker build template"
-  aws cloudformation package \
-    --template-file ui/cloudformation/docker_build_pipeline.yml \
-    --s3-bucket "${S3_BUCKET}" \
-    --output-template-file "packaged_docker_build_pipeline.yaml"
-
-  # Copy to S3
-  aws s3 cp "packaged_docker_build_pipeline.yaml" "s3://${S3_BUCKET}/packaged_docker_build_pipeline.yaml"
+  echo "Copying react app docker build template"
+  aws s3 cp "ui/cloudformation/docker_build_pipeline.yml" "s3://${S3_BUCKET}/ui/docker_build_pipeline.yml"
 fi
 echo "All templates packaged and uploaded to S3"

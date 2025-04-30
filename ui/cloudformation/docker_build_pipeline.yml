@@ -8,10 +8,8 @@ Parameters:
   PackageArtifactKey:
     Type: String
     Description: Artifact S3 key for source code package 
-    Default: ui_artifact.zip
   ProjectName:
     Type: String
-    Default: hclsagents-project
     Description: Project name for the Code Build project
 
 Resources:

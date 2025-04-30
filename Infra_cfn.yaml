@@ -1194,10 +1194,11 @@ Resources:
     DependsOn: 
       - AgentBuildNestedStack
     Properties:
-      TemplateURL: !Sub https://${S3Bucket}.s3.${AWS::Region}.amazonaws.com/packaged_docker_build_pipeline.yaml
+      TemplateURL: !Sub https://${S3Bucket}.s3.${AWS::Region}.amazonaws.com/ui/docker_build_pipeline.yml
       Parameters:
         ProjectName: !Sub ${EnvironmentName}-react-ui
         PackageBucketName: !Sub ${S3Bucket}
+        PackageArtifactKey: ui/ui_artifact.zip
       TimeoutInMinutes: 35
 Outputs:
   RedshiftClusterEndpoint:
