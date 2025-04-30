@@ -1,4 +1,4 @@
-# Research agents for LifeSciences with Amazon Bedrock Agents
+# Research agents for Life Sciences with Amazon Bedrock Agents
 
 Explore the following components in the repository:
 ## Agents catalog
@@ -65,6 +65,26 @@ The multi-agent solution overview is illustrated below.
    2. Click the Streamlit nested stack (format: `<stackname>-StreamlitBuildNestedStack-<123ABCXXXX>`)
    3. In the Outputs tab, find the CloudFrontURL link and add 'https://' to the beginning of the URL and paste in your browser
 
+## Model Context Protocol (MCP)
+
+The [Tavily web search](agents_catalog/11-Tavily-web-search-agent/README.md) and [USPTO search](agents_catalog/14-USPTO-search/README.md) tools can be added to your MCP client of choice using the [AWS Lambda MCP Server](https://awslabs.github.io/mcp/servers/lambda-mcp-server/). After installing one of both of them, you can add them to your MCP client configuration:
+
+```json
+"hcls-agents": {
+   "args": ["awslabs.lambda-mcp-server"],
+   "env": {
+         "AWS_ACCESS_KEY_ID": "<YOUR AWS ACCESS KEY ID>",
+         "AWS_SECRET_ACCESS_KEY": "<YOUR AWS SECRET ACCESS KEY>",
+         "AWS_SESSION_TOKEN":"<YOUR AWS SESSION TOKEN>",
+         "AWS_REGION": "YOUR AWS REGION",
+         "FUNCTION_TAG_KEY": "Application",
+         "FUNCTION_TAG_VALUE": "HCLSAgents",
+   },
+   "command": "uvx"
+}
+```
+
+Depending on your local environment, you may need to provide the full path to your `uvx` executable. View the [installation instructions](https://awslabs.github.io/mcp/servers/lambda-mcp-server/#installation) for more ways to provide AWS credentials to the tools.
 
 ## Contributing Guidelines
 

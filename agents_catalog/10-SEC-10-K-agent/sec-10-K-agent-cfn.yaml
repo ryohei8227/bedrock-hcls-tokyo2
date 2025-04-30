@@ -7,7 +7,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
@@ -154,17 +154,7 @@ Resources:
                     Description: An identifier that highlights specific information to EDGAR in the format required by the EDGAR Filer Manual. e.g. 'EntityCommonStockSharesOutstanding', 'AcceleratedShareRepurchasesFinalPricePaidPerShare'
                     Type: string
                     Required: True
-      AgentName:
-        !Join [
-          "-",
-          [
-            "sec-10-k-search-agent",
-            !Select [
-              4,
-              !Split ["-", !Select [2, !Split ["/", !Ref "AWS::StackId"]]],
-            ],
-          ],
-        ]
+      AgentName: "SEC-10-K-Search-Agent"
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Perform financial analysis of a given company using the their SEC 10-K filings in the EDGAR database"

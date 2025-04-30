@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Creates the web search agent.
+Description: Creates the uspto search agent.
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Web Search API keys
+          default: Search API keys
         Parameters:
-          - TavilyApiKey
+          - USPTOApiKey
 Parameters:
   AgentAliasName:
     Type: String
@@ -18,14 +18,14 @@ Parameters:
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
-  TavilyApiKey:
+  USPTOApiKey:
     Type: String
     NoEcho: true
-    Description: Provide TavilyApiKey API Key to utilize /web_search path
+    Description: Provide USPTO API Key to utilize /search path
     MinLength: 1
 
 Conditions:
-  HasTavilyApiKeyCondition: !Not [!Equals [!Ref TavilyApiKey, ""]]
+  HasUSPTOApiKeyCondition: !Not [!Equals [!Ref USPTOApiKey, ""]]
   CreateAgentAliasCondition: !Not [!Equals [!Ref AgentAliasName, ""]]
 
 Resources:
@@ -33,42 +33,42 @@ Resources:
   ##### API Keys #####
   ###################
 
-  TavilyApiKeySecret:
+  USPTOApiKeySecret:
     Type: "AWS::SecretsManager::Secret"
-    Condition: HasTavilyApiKeyCondition
+    Condition: HasUSPTOApiKeyCondition
     Properties:
       Name: !Sub
-        - "TAVILY_API_KEY_${StackId}"
+        - "USPTO_API_KEY_${StackId}"
         - StackId: !Select [2, !Split ["/", !Ref AWS::StackId]]
-      Description: "API Key for Tavily service"
-      SecretString: !Ref TavilyApiKey
+      Description: "API Key for USPTO service"
+      SecretString: !Ref USPTOApiKey
 
   ########################
-  ##### WebSearch #####
+  ##### USPTOSearch #####
   ######################
 
-  WebSearchLambdaFunction:
+  USPTOSearchLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: TavilyWebSearch
-      Description: "Search the web with { 'search_query' } parameter. Optional { 'days' } parameter for days of history to search and { 'topic' } parameter for either 'news' or 'general' content type."
+      FunctionName: SearchUSPTO
+      Description: Search for USPTO patent information using { 'search_query' } parameter (e.g. 'Cancer treatment'). Accepts optional { 'days' } parameter, representing the number of days in the past to search (e.g. '100').
       Runtime: python3.13
       Handler: index.lambda_handler
-      Role: !GetAtt WebSearchLambdaRole.Arn
+      Role: !GetAtt USPTOSearchLambdaRole.Arn
       Timeout: 30
       MemorySize: 128
       Environment:
         Variables:
-          ACTION_GROUP: "WebSearchActionGroup"
-          TAVILY_API_KEY_NAME: !Sub
-            - "TAVILY_API_KEY_${StackId}"
+          ACTION_GROUP: "USPTOSearchActionGroup"
+          USPTO_API_KEY_NAME: !Sub
+            - "USPTO_API_KEY_${StackId}"
             - StackId: !Select [2, !Split ["/", !Ref AWS::StackId]]
-      Code: "action-groups/web-search"
+      Code: "action-groups/uspto-search"
       Tags:
         - Key: Application
           Value: HCLSAgents
 
-  WebSearchLambdaRole:
+  USPTOSearchLambdaRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -91,22 +91,22 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource:
-                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:TAVILY_API_KEY_*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:USPTO_API_KEY_*
 
-  WebSearchLambdaAgentPermission:
+  USPTOSearchLambdaAgentPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt WebSearchLambdaFunction.Arn
+      FunctionName: !GetAtt USPTOSearchLambdaFunction.Arn
       Principal: bedrock.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
       SourceArn: !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:agent-alias/*
 
-  WebSearchLambdaAgentAliasPermission:
+  USPTOSearchLambdaAgentAliasPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !GetAtt WebSearchLambdaFunction.Arn
+      FunctionName: !GetAtt USPTOSearchLambdaFunction.Arn
       Principal: bedrock.amazonaws.com
       SourceAccount: !Ref AWS::AccountId
       SourceArn: !Sub arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*
@@ -115,87 +115,70 @@ Resources:
   ##### Agent #####
   ###################
 
-  WebSearchAgent:
+  USPTOSearchAgent:
     Type: AWS::Bedrock::Agent
     Properties:
       ActionGroups:
         - ActionGroupName: "UserInputAction"
           ParentActionGroupSignature: "AMAZON.UserInput"
           ActionGroupState: "ENABLED"
-        - ActionGroupName: WebSearch
+        - ActionGroupName: USPTOSearch
           Description: Actions for answering questions with information from the internet
           ActionGroupExecutor:
-            Lambda: !GetAtt WebSearchLambdaFunction.Arn
+            Lambda: !GetAtt USPTOSearchLambdaFunction.Arn
           ActionGroupState: ENABLED
           FunctionSchema:
             Functions:
-              - Name: web_search
-                Description: Execute an internet search query using Tavily Search.
+              - Name: uspto_search
+                Description: Search the USPTO Open Data system for a given query
                 Parameters:
                   search_query:
-                    Description: "The search query to execute with Tavily. Example: 'Who is Leo Messi?'"
+                    Description: "The search query to execute with USPTO. Example: 'Nanobodies'"
                     Type: string
                     Required: True
-                  target_website:
-                    Description: "The specific website to search including its domain name. If not provided, the most relevant website will be used"
-                    Type: string
-                    Required: False
-                  topic:
-                    Description: "The topic being searched. 'news' or 'general'. Helps narrow the search when news is the focus."
-                    Type: string
-                    Required: False
                   days:
                     Description: "The number of days of history to search. Helps when looking for recent events or news."
                     Type: string
                     Required: False
-      AgentName: Tavily-Web-Search-Agent
+      AgentName: "USPTO-Search-Agent"
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
-      Description: "Answer questions by searching the internet."
+      Description: "Get Patent information from the US Patent and Trademark Office"
       FoundationModel: !Ref BedrockModelId
       GuardrailConfiguration:
-        GuardrailIdentifier: !GetAtt WebSearchGuardrail.GuardrailId
-        GuardrailVersion: !GetAtt WebSearchGuardrail.Version
+        GuardrailIdentifier: !GetAtt USPTOSearchGuardrail.GuardrailId
+        GuardrailVersion: !GetAtt USPTOSearchGuardrail.Version
       Instruction: |
-        You are a research assistant specializing in web-based information retrieval. Your task:
+        # Patent Search Assistant Instructions
 
-        1. Analyze queries precisely
-        2. Search for authoritative, current sources
-        3. Deliver concise, factual responses
-        4. Include source citations
+        You are a specialized assistant leveraging Claude 3.5 Sonnet v2 to help users search the USPTO patent database. Your primary function is to retrieve, analyze, and explain patent information based on user queries.
 
-        Guidelines:
-        - Communicate with clarity and precision
-        - Evaluate source reliability
-        - Focus on recent, relevant data
-        - Decompose complex questions
-        - Document search methodology
-        - Request query refinement when needed
+        ## How to Help Users
 
-        Citation format:
-        Present findings with source URLs in parentheses:
-        "[Factual response] (source: [URL])"
+        1. When users ask about patents, help them formulate effective search queries by:
+          - Clarifying technical terminology
+          - Identifying key search terms
+          - Suggesting appropriate search parameters (date ranges, classifications, etc.)
 
-        For example, if the user asks:
+        2. After retrieving patent information:
+          - Always return the application number
+          - Always return the applicant name
+          - Always return the effective filing date
+          - Summarize key details in plain language
+          - Explain technical concepts found in patents
+          - Highlight important claims and applications
+          - Identify assignees and filing dates
 
-        "who built the tower of london?"
-
-        And you find the answer at this url:
-
-        "https://en.wikipedia.org//w/index.php?title=Tower_of_London"
-
-        A good response is: 
-
-        "William the Conqueror built the tower of london in 1078 (source: https://en.wikipedia.org//w/index.php?title=Tower_of_London)"
+        Always maintain a helpful, informative tone while translating complex patent language into clear explanations for users of all technical backgrounds.
 
   AgentAliasResource:
     Type: AWS::Bedrock::AgentAlias
     Condition: CreateAgentAliasCondition
     Properties:
-      AgentId: !GetAtt WebSearchAgent.AgentId
+      AgentId: !GetAtt USPTOSearchAgent.AgentId
       AgentAliasName: !Ref AgentAliasName
 
-  WebSearchGuardrail:
+  USPTOSearchGuardrail:
     Type: AWS::Bedrock::Guardrail
     Properties:
       BlockedInputMessaging: "Sorry, your query violates our usage policies."
@@ -204,24 +187,12 @@ Resources:
         FiltersConfig:
           - InputStrength: "HIGH"
             OutputStrength: "HIGH"
-            Type: "SEXUAL"
-          - InputStrength: "HIGH"
-            OutputStrength: "HIGH"
-            Type: "VIOLENCE"
-          - InputStrength: "HIGH"
-            OutputStrength: "HIGH"
-            Type: "HATE"
-          - InputStrength: "HIGH"
-            OutputStrength: "HIGH"
-            Type: "INSULTS"
-          - InputStrength: "HIGH"
-            OutputStrength: "HIGH"
             Type: "MISCONDUCT"
           - InputStrength: "HIGH"
             OutputStrength: "NONE"
             Type: "PROMPT_ATTACK"
       Description: Turn on to block profane words and other harmful content.
-      Name: WebSearchGuardrail
+      Name: USPTOSearchGuardrail
       WordPolicyConfig:
         ManagedWordListsConfig:
           - Type: PROFANITY
@@ -229,7 +200,7 @@ Resources:
 Outputs:
   AgentId:
     Description: Agent ID
-    Value: !Ref WebSearchAgent
+    Value: !Ref USPTOSearchAgent
   AgentAliasId:
     Description: Agent Alias ID
     Value: !GetAtt AgentAliasResource.AgentAliasId
