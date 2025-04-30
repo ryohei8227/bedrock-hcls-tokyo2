@@ -65,7 +65,13 @@ Answer questions using information retrieved by the [Wiley Oline Library](https:
   }
 }
 ```
-## 3. Python Installation
+
+## 3 Instalation
+
+You can install this agent by following one of the following approaches
+
+
+## 3.1 Instaling with Python and Boto
 ```bash
 python -m venv ./.venv
 source ./.venv/bin/activate
@@ -118,7 +124,7 @@ Deleting role 'AmazonBedrockExecutionRoleForLambda_b7e6uwuv'...
 All demo resources have been deleted. Thanks again for running the demo!
 ```
 
-## 4. Cloudformation Installation
+## 3.2 Instaling with Cloudformation
 
 1. (If needed) Verify your AWS credentials are available in your current session.
 
