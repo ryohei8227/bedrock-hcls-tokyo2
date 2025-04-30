@@ -79,10 +79,10 @@ fi
 
 # Process react app docker build template
 echo "Processing react app docker build template..."
-if [ -d "ui" ] && [ -f "ui/cloudformation/docker-build-pipeline.yml" ]; then
+if [ -d "ui" ] && [ -f "ui/cloudformation/docker_build_pipeline.yml" ]; then
   echo "Packaging react app docker build template"
   aws cloudformation package \
-    --template-file ui/cloudformation/docker-build-pipeline.yml \
+    --template-file ui/cloudformation/docker_build_pipeline.yml \
     --s3-bucket "${S3_BUCKET}" \
     --output-template-file "packaged_docker_build_pipeline.yaml"
 
