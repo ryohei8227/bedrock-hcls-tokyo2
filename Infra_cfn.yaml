@@ -28,7 +28,7 @@ Parameters:
   GithubLink:
    Type: String
    Description: 'The link to the agent build cloudformation stack'
-   Default: 'https://github.com/aws-samples/amazon-bedrock-agents-cancer-biomarker-discovery.git'
+   Default: 'https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences.git'
   ImageTag:
     Type: String
     Default: latest
@@ -42,7 +42,7 @@ Parameters:
   GitBranch:
     Type: String
     Description: The github branch to clone 
-    Default: main
+    Default: merge_react_app
 
 
 Mappings:
@@ -211,6 +211,19 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${AWS::StackName}-PublicSubnet1
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-PublicSubnet2
   NatGatewayEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -1175,6 +1188,16 @@ Resources:
         GitRepoURL: !Ref GithubLink
         ImageTag: !Ref ImageTag
         GitBranch: !Ref GitBranch
+      TimeoutInMinutes: 35
+  ReactAppDockerBuildNestedStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: 
+      - AgentBuildNestedStack
+    Properties:
+      TemplateURL: !Sub https://${S3Bucket}.s3.${AWS::Region}.amazonaws.com/packaged_docker_build_pipeline.yaml
+      Parameters:
+        ProjectName: !Sub ${EnvironmentName}-react-ui
+        PackageBucketName: !Sub ${S3Bucket}
       TimeoutInMinutes: 35
 Outputs:
   RedshiftClusterEndpoint:
