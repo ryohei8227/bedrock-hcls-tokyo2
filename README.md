@@ -1,37 +1,46 @@
-# Research agents for Life Sciences with Amazon Bedrock Agents
+# Sample Healthcare and Life Sciences Agents on AWS
 
 Explore the following components in the repository:
+
 ## Agents catalog
+
 Library of specialized agents for different R&D workflows [agent-catalog](agents_catalog/)
+
 ## Multi-agent collaboration
+
 Framework for agent collaboration and knowledge sharing. End to end example for cancer biomarker discovery [multi-agent](multi_agent_collaboration/cancer_biomarker_discovery/README.md)
+
 ## Evaluation
+
 Methods for assessing agent performance and result quality. End to end example for cancer biomarker discovery [evaluations](evaluations/README.md)
 
 ## Accelerate analysis and discovery of cancer biomarkers with Agents for Bedrock
+
 Read more about these agents here:
-https://aws.amazon.com/blogs/machine-learning/accelerate-analysis-and-discovery-of-cancer-biomarkers-with-amazon-bedrock-agents/
+<https://aws.amazon.com/blogs/machine-learning/accelerate-analysis-and-discovery-of-cancer-biomarkers-with-amazon-bedrock-agents/>
 
 ## Solution Overview
-The multi-agent solution overview is illustrated below. 
-![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg) 
+
+The multi-agent solution overview is illustrated below.
+![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg)
 
 ## Deployment
+
 ### Note: You can choose to deploy the agents with one-click deployment or set them up yourself in workshop mode
 
 > [!IMPORTANT]  
 > Access to Amazon Bedrock foundation models (not granted by default). To gain access, follow the [official documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
-
 1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-cancer-biomarker-discovery](https://github.com/aws-samples/amazon-bedrock-agents-cancer-biomarker-discovery) repository to AWS CloudFormation. This template will set up:
+
 > [!WARNING]  
 > Launching this stack will create 2 VPCs (Infrastructure and UI).
 
-   - Networking infrastructure (VPC, Subnets, etc.)
-   - Amazon Redshift database
-   - Bedrock Agent with Actions
-   - Knowledgebase
-   - Streamlit UI frontend
+- Networking infrastructure (VPC, Subnets, etc.)
+- Amazon Redshift database
+- Bedrock Agent with Actions
+- Knowledgebase
+- Streamlit UI frontend
 
 2. Deploy the `Infra_cfn.yaml` template:
    - Default parameter values can remain unchanged
@@ -102,6 +111,7 @@ Depending on your local environment, you may need to provide the full path to yo
 4. For testing purposes, deploy the `infra_cfn.yaml` template to AWS CloudFormation.
 
 ### Submitting a Pull Request
+
 **Follow the guidelines to contribute a new agent to the catalog here: [add-a-new-agent](https://aws-samples.github.io/amazon-bedrock-agents-healthcare-lifesciences/guides/)
 
 1. Ensure you have forked the main repository: [amazon-bedrock-agents-healthcare-lifesciences](https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences/tree/main)
@@ -121,7 +131,9 @@ Depending on your local environment, you may need to provide the full path to yo
 8. Be prepared to address any feedback or questions during the code review process.
 
 ## License
+
 This project is licensed under the MIT License.
 
 ## Legal Notes
+
 **<span style="color:RED">Important</span>**: This solution is for demonstrative purposes only. It is not for clinical use and is not a substitute for professional medical advice, diagnosis, or treatment. **The associated notebooks, including the trained model and sample data, are not intended for production.** It is each customers’ responsibility to determine whether they are subject to HIPAA, and if so, how best to comply with HIPAA and its implementing regulations. Before using AWS in connection with protected health information, customers must enter an AWS Business Associate Addendum (BAA) and follow its configuration requirements.
