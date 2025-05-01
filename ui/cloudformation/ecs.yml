@@ -90,7 +90,7 @@ Resources:
       GroupDescription: Access to the public facing load balancer
       VpcId: !Ref VPCId
       SecurityGroupIngress:
-          - CidrIp: !Ref CidrIp
+          - SourcePrefixListId: !Ref CidrIp
             IpProtocol: -1
 
   PublicLoadBalancer:
