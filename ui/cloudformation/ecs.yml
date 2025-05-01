@@ -10,22 +10,15 @@ Parameters:
   VPCId:
     Type: String
     Description: The ID of the VPC in which to deploy
-    Default:
-      Fn::ImportValue: hcls-agents-vpc
   CidrIp:
     Type: String
     Description: The CIDR IP range to allow access to the ALB
-    Default: pl-c0b451a9
   PublicSubnet1:
     Type: String
     Description: The ID of the public subnet 1
-    Default:
-      Fn::ImportValue: hcls-agents-public-subnet-1
   PublicSubnet2:
     Type: String
     Description: The ID of the public subnet 2
-    Default:
-      Fn::ImportValue: hcls-agents-public-subnet-1
   ServiceName:
     Type: String
     Default: hcls-agents-react-ui-service
