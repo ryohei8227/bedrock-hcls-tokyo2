@@ -10,27 +10,31 @@ Parameters:
   VPCId:
     Type: String
     Description: The ID of the VPC in which to deploy
-    Default: vpc-095e2949298c62d04
+    Default:
+      Fn::ImportValue: hcls-agents-vpc
   CidrIp:
     Type: String
     Description: The CIDR IP range to allow access to the ALB
-    Default: 10.0.0.0/16
+    Default: pl-c0b451a9
   PublicSubnet1:
     Type: String
     Description: The ID of the public subnet 1
-    Default: subnet-0eb001d42dca1c66b
+    Default:
+      Fn::ImportValue: hcls-agents-public-subnet-1
   PublicSubnet2:
     Type: String
     Description: The ID of the public subnet 2
-    Default: subnet-0496e618547c907c1
+    Default:
+      Fn::ImportValue: hcls-agents-public-subnet-1
   ServiceName:
     Type: String
-    Default: test-hcls-agents-ui-service
+    Default: hcls-agents-react-ui-service
     Description: A name for the service
   ImageUrl:
     Type: String
-    Default: 252246751226.dkr.ecr.us-east-1.amazonaws.com/hclsagents-docker-repo:latest
-    Description: The url of a docker image that contains the application process that
+    Default: 
+      Fn::ImportValue: hcls-agents-ui-ecr-repository-uri
+    Description: The uri of a docker image that contains the application process that
                  will handle the traffic for this service
   ContainerPort:
     Type: Number
@@ -95,7 +99,6 @@ Resources:
       GroupDescription: Access to the public facing load balancer
       VpcId: !Ref VPCId
       SecurityGroupIngress:
-          # Allow access to ALB from anywhere on the internet
           - CidrIp: !Ref CidrIp
             IpProtocol: -1
 

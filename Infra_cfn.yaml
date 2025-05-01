@@ -1200,7 +1200,30 @@ Resources:
         PackageBucketName: !Sub ${S3Bucket}
         PackageArtifactKey: ui/ui_artifact.zip
       TimeoutInMinutes: 35
+  ReactAppEcsBuildNestedStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: 
+      - ReactAppDockerBuildNestedStack
+    Properties:
+      TemplateURL: !Sub https://${S3Bucket}.s3.${AWS::Region}.amazonaws.com/ui/ecs.yml
+      TimeoutInMinutes: 35
 Outputs:
   RedshiftClusterEndpoint:
     Description: Redshift Cluster Endpoint
     Value: !GetAtt RedshiftCluster.Endpoint.Address
+  ProjectVpcId:
+    Description: Project VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: 'hcls-agents-vpc'
+  ProjectPublicSubnet1:
+    Description: Project Public Subnet 1
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: 'hcls-agents-public-subnet-1'
+  ProjectPublicSubnet2:
+    Description: Project Public Subnet 2
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: 'hcls-agents-public-subnet-2'
+  

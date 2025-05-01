@@ -83,4 +83,11 @@ if [ -d "ui" ] && [ -f "ui/cloudformation/docker_build_pipeline.yml" ]; then
   echo "Copying react app docker build template"
   aws s3 cp "ui/cloudformation/docker_build_pipeline.yml" "s3://${S3_BUCKET}/ui/docker_build_pipeline.yml"
 fi
+
+# Process react app ECS service build template
+echo "Processing react app ECS service build template..."
+if [ -d "ui" ] && [ -f "ui/cloudformation/ecs.yml" ]; then
+  echo "Copying react app ECS build template"
+  aws s3 cp "ui/cloudformation/ecs.yml" "s3://${S3_BUCKET}/ui/ecs.yml"
+fi
 echo "All templates packaged and uploaded to S3"

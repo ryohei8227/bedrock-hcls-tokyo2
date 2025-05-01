@@ -222,7 +222,9 @@ Resources:
 Outputs:
   ECRRepositoryURI:
     Description: ECR Repository URI
-    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}
+    Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}:latest
+    Export:
+      Name: hcls-agents-ui-ecr-repository-uri
   
   CodeBuildProjectName:
     Description: CodeBuild Project Name
