@@ -1,4 +1,4 @@
-# Sample Healthcare and Life Science Agents on AWS
+# Sample Healthcare and Life Sciences Agents on AWS
 
 Explore the following components in the repository:
 
