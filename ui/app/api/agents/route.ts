@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server';
 import { BedrockAgentClient, ListAgentsCommand, GetAgentCommand, ListTagsForResourceCommand, ListAgentCollaboratorsCommand, ListAgentVersionsCommand } from "@aws-sdk/client-bedrock-agent";
 //import { fromEnv } from "@aws-sdk/credential-providers";
 
-const REGION = "us-west-2"; 
+import dotenv from "dotenv";
+dotenv.config();
+
+const REGION: string = process.env.AWS_REGION
+
 
 const client = new BedrockAgentClient({ 
   region: REGION

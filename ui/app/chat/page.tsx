@@ -46,7 +46,7 @@ export default function ChatPage() {
     setMessages((prev) => [
       ...prev,
       {
-        sender: 'HCLS Agentic AI',
+        sender: 'AI Agent',
         text: '',
         trace: [{ type: 'placeholder', text: 'Trace loading for chat id : ' + chat_request_id }],
         expandTrace: true
@@ -70,75 +70,86 @@ export default function ChatPage() {
     let finalText = '';
     let stepCount = 0;
 
+    let buffer = '';
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+      
+      buffer += decoder.decode(value, { stream: true });
 
-      const chunk = decoder.decode(value);
-      chunk.split('\n\n').forEach(line => {
-        if (!line.startsWith('data: ')) return;
-        try {
-          const parsed = JSON.parse(line.replace('data: ', ''));
+      let boundary = buffer.indexOf('\n\n');
+      while (boundary !== -1) {
+        const fullChunk = buffer.slice(0, boundary).trim();
+        buffer = buffer.slice(boundary + 2);
 
-          if (parsed.type === 'chunk') {
-            finalText += parsed.data;
-            setMessages((prev) => {
-              const lastMsg = prev[prev.length - 1];
-              if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-                return [...prev, { sender: 'HCLS Agentic AI', text: parsed.data, trace: [{ type: 'placeholder', text: 'Trace loading...' }], expandTrace: true }];
-              }
-              const updated = [...prev];
-              updated[updated.length - 1].text += parsed.data;
-              return updated;
-            });
-          }
-
-          else if (['rationale', 'tool', 'observation', 'agent-collaborator', 'error'].includes(parsed.type)) {
-            const step = parsed.step !== undefined ? parsed.step : stepCount + 1;
-            stepCount = step;
-            const agent = parsed.agent || parsed.data?.agent || 'unknown-agent';
-            const traceStep = { ...parsed, step, agent };
-            setMessages((prev) => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (!lastMsg || lastMsg.sender !== 'HCLS Agentic AI') {
-              updated.push({ sender: 'HCLS Agentic AI', text: '', trace: [traceStep], expandTrace: true });
-            } else {
-              const existing = lastMsg.trace || [];
-              const alreadyExists = existing.some(t =>
-                t.step === traceStep.step &&
-                t.type === traceStep.type &&
-                t.text === traceStep.text
-              );
-              if (!alreadyExists) {
-                lastMsg.trace = [...existing.filter(t => t.type !== 'placeholder'), traceStep];
-lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
+        if (fullChunk.startsWith('data: ')) {
+          try {
+            const parsed = JSON.parse(fullChunk.slice(6));
+  
+            if (parsed.type === 'chunk') {
+              finalText += parsed.data;
+              setMessages((prev) => {
+                const lastMsg = prev[prev.length - 1];
+                if (!lastMsg || lastMsg.sender !== 'AI Agent') {
+                  return [...prev, { sender: 'AI Agent', text: parsed.data, trace: [{ type: 'placeholder', text: 'Trace loading...' }], expandTrace: true }];
                 }
-                lastMsg.expandTrace = true;
-              }
-              return updated;
-            });
+                const updated = [...prev];
+                updated[updated.length - 1].text += parsed.data;
+                return updated;
+              });
+            }
+  
+            else if (['rationale', 'tool', 'observation', 'agent-collaborator', 'knowledge-base', 'error'].includes(parsed.type)) {
+              const step = parsed.step !== undefined ? parsed.step : stepCount + 1;
+              stepCount = step;
+              const agent = parsed.agent || parsed.data?.agent || 'unknown-agent';
+              const traceStep = { ...parsed, step, agent };
+              setMessages((prev) => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (!lastMsg || lastMsg.sender !== 'AI Agent') {
+                updated.push({ sender: 'AI Agent', text: '', trace: [traceStep], expandTrace: true });
+              } else {
+                const existing = lastMsg.trace || [];
+                const alreadyExists = existing.some(t =>
+                  t.step === traceStep.step &&
+                  t.type === traceStep.type &&
+                  t.text === traceStep.text
+                );
+                if (!alreadyExists) {
+                  lastMsg.trace = [...existing.filter(t => t.type !== 'placeholder'), traceStep];
+  lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
+                  }
+                  lastMsg.expandTrace = true;
+                }
+                return updated;
+              });
+            }
+            else if (parsed.type === 'end') {
+              setMessages((prev) => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg && lastMsg.sender === 'AI Agent') {
+                lastMsg.text = parsed.finalMessage || finalText;
+                lastMsg.timestamp = new Date().toISOString();
+                lastMsg.images = parsed.images || (parsed.image ? [parsed.image] : []);
+                lastMsg.trace = (lastMsg.trace || []).filter(t => t.type !== 'placeholder');
+                  lastMsg.expandTrace = true;
+                }
+                return updated;
+              });
+              setIsProcessing(false);
+            }
+  
+          } catch (e) {
+            console.error('Error parsing SSE:', e);
+            console.error(fullChunk);
           }
-          else if (parsed.type === 'end') {
-            setMessages((prev) => {
-              const updated = [...prev];
-              const lastMsg = updated[updated.length - 1];
-              if (lastMsg && lastMsg.sender === 'HCLS Agentic AI') {
-              lastMsg.text = parsed.finalMessage || finalText;
-              lastMsg.timestamp = new Date().toISOString();
-              lastMsg.image = parsed.image || null;
-              lastMsg.trace = (lastMsg.trace || []).filter(t => t.type !== 'placeholder');
-                lastMsg.expandTrace = true;
-              }
-              return updated;
-            });
-            setIsProcessing(false);
-          }
-
-        } catch (e) {
-          console.error('Error parsing SSE:', e);
         }
-      });
+        
+        boundary = buffer.indexOf('\n\n');
+
+      }  
     }
   };
 
@@ -170,7 +181,7 @@ lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
     <div className="min-h-screen flex flex-col bg-gray-100">
       <header className="bg-white shadow p-4 text-center text-2xl font-bold">
         <Image src="/images/aws-logo.svg" alt="AWS Logo" width={150} height={50} className="mx-auto mb-2" />
-        Chat with Selected HCLS Agents
+        Chat with Selected Agents
       </header>
 
       <div className="flex flex-1 p-4 gap-4 relative">
@@ -317,12 +328,23 @@ lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
                           <span className="block">{step.text}</span>
                         </div>
                         )}
+                        {step.type === 'knowledge-base' && (
+                          <div className="max-w-full break-all whitespace-pre-wrap mt-4 p-3 border rounded-md bg-gray-50">
+                            <span className="font-semibold">📚 Knowledge Base Result:</span>
+                            <span className="block">{step.text}</span>
+                          </div>
+                        )}
                         {step.type === 'placeholder' && (
                           <div className="italic text-gray-400">⏳ {step.text}</div>
                         )}
-                        {step.type === 'error' && (
-                          <div className="text-red-600 font-medium">❌ Error: {step.message || step.text}</div>
-                        )}
+                        {step.type === 'error' && (() => {
+                          console.error('Agent execution error:', step.message || step.text);
+                          return (
+                            <div className="block font-medium">
+                              Something went wrong during agent execution.
+                            </div>
+                          );
+                        })()}
                       </div>
                     </details>
                   ))}
@@ -336,11 +358,21 @@ lastMsg.trace.push(existing.find(t => t.type === 'placeholder'));
                     <span className="ml-2 text-xs text-gray-400">{formatTime(msg.timestamp)}</span>
                   </p>
                 )}
-                {msg.image && (
-                  <div className="mt-2">
-                    <Image src={msg.image} alt="Generated Visual" width={800} height={600} className="rounded shadow border" unoptimized/>
-                  </div>
-                )}
+                {msg.images && msg.images.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  {msg.images.map((url, idx) => (
+                    <Image
+                      key={idx}
+                      src={url}
+                      alt={`Generated Visual ${idx + 1}`}
+                      width={800}
+                      height={600}
+                      className="rounded shadow border"
+                      unoptimized
+                    />
+                  ))}
+                </div>
+              )}
               </div>
             ))}
             {isProcessing && (

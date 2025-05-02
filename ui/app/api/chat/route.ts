@@ -9,7 +9,11 @@ import {
   GetAgentAliasCommand
 } from "@aws-sdk/client-bedrock-agent";
 
-const REGION = "us-west-2"; 
+import dotenv from "dotenv";
+dotenv.config();
+
+const REGION: string = process.env.AWS_REGION
+
 
 const runtimeClient = new BedrockAgentRuntimeClient({ region: REGION });
 const controlClient = new BedrockAgentClient({ region: REGION });

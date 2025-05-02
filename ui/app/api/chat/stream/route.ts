@@ -10,7 +10,11 @@ import {
 } from '@aws-sdk/client-bedrock-agent';
 import { a, p } from 'framer-motion/client';
 
-const REGION = 'us-west-2';
+import dotenv from "dotenv";
+dotenv.config();
+
+const REGION: string = process.env.AWS_REGION
+
 
 const runtimeClient = new BedrockAgentRuntimeClient({ region: REGION });
 const controlClient = new BedrockAgentClient({ region: REGION });
@@ -47,12 +51,23 @@ export async function invokeInlineAgentHelper(requestParams) {
   }
 }
 
-function extractAndRemoveImageUrl(text: string): [string | null, string] {
-  const imageUrlRegex = /(https:\/\/[^\s"]+\.(png|jpg|jpeg|webp)[^\s"]*)/i;
-  const match = text.match(imageUrlRegex);
-  const imageUrl = match ? match[1] : null;
-  const cleanedText = match ? text.replace(imageUrlRegex, '').trim() : text;
-  return [imageUrl, cleanedText];
+function extractAndRemoveImageUrls(text: string): [string[], string] {
+  const imageUrlRegex = /(https:\/\/[^\s"']+\.(?:png|jpg|jpeg|webp)[^\s"']*)/gi;
+  const imageUrls = [...text.matchAll(imageUrlRegex)].map(match => match[1]);
+  const cleanedText = text.replace(imageUrlRegex, '').trim();
+  return [imageUrls, cleanedText];
+}
+
+
+function chunkTextSafely(text: string, size: number = 3000): string[] {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += size) {
+    let chunk = text.slice(i, i + size).trim();
+    if (i > 0) chunk = '... ' + chunk;            
+    if (i + size < text.length) chunk += ' ...';  
+    chunks.push(chunk);
+  }
+  return chunks;
 }
 
 
@@ -92,7 +107,12 @@ export async function POST(req: NextRequest) {
       enableTrace: true,
       agentCollaboration: 'SUPERVISOR_ROUTER',
       inputText: message,
-      collaboratorConfigurations
+      collaboratorConfigurations,
+      inlineSessionState: {
+        promptSessionAttributes: {
+          today: new Date().toISOString().split('T')[0],
+        },
+      },
     };
 
     log('Invoking agent collaboration', requestParams);
@@ -102,7 +122,7 @@ export async function POST(req: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         let finalMessage = '';
-        let imageUrl = null;
+        let imageUrls: string[] = [];
         let step = 1;
         let inputTokens = 0;
         let outputTokens = 0;
@@ -184,22 +204,48 @@ export async function POST(req: NextRequest) {
               if (obsTool) {
                 log(`Tool observation from "${agentId}"`, obsTool);
   
-                const [extractedUrl, cleanedText] = extractAndRemoveImageUrl(obsTool);
-                if (extractedUrl && !imageUrl) {
-                  imageUrl = extractedUrl;
-                  log('Image URL captured from observation text', imageUrl);
+                const [extractedUrls, cleanedText] = extractAndRemoveImageUrls(obsTool);
+                if (extractedUrls.length > 0) {
+                  imageUrls.push(...extractedUrls); // ✅ flattening
+                  log('Image URLs captured from observation text', extractedUrls);
                 }
-  
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-                  type: 'observation',
-                  step,
-                  agent: agentId,
-                  text: cleanedText
-                })}\n\n`));
+
+                const obs_chunks = chunkTextSafely(cleanedText, 4000);
+                for (const obs_chunk of obs_chunks) {
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                    type: 'observation',
+                    step,
+                    agent: agentId,
+                    text: obs_chunk
+                  })}\n\n`));
+                }
                 step++;
               }
-  
-  
+
+              const kbOutput = trace.observation?.knowledgeBaseLookupOutput;
+              if (kbOutput?.retrievedReferences?.length) {
+                log('Knowledge Base lookup retrieved references', kbOutput.retrievedReferences);
+              
+                for (const reference of kbOutput.retrievedReferences) {
+                  console.log('Reference Object:', JSON.stringify(reference, null, 2));
+              
+                  const metadata = reference.metadata || {};
+                  const sourceUri = metadata['x-amz-bedrock-kb-source-uri'] || '';
+                  const contentText = reference.content?.text || '';
+              
+                  if (contentText) {
+                    const combinedText = `${contentText}\n\nReference: ${sourceUri}`;
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                      type: 'knowledge-base',  
+                      step,
+                      agent: agentId,
+                      text: combinedText
+                    })}\n\n`));
+                  }
+                }
+                step++;
+                
+              }                            
               const finalResp = trace.observation?.finalResponse;
               if (finalResp?.text) {
                 log(`Final response from "${agentId}"`, finalResp.text);
@@ -221,8 +267,8 @@ export async function POST(req: NextRequest) {
   
               const attachment = finalResp?.attachments?.[0];
               if (attachment?.url) {
-                imageUrl = attachment.url;
-                log('Image URL captured from response', imageUrl);
+                imageUrls.push(attachment.url);
+                log('Image URL captured from response', attachment.url);
               }
             }
           }
@@ -244,7 +290,7 @@ export async function POST(req: NextRequest) {
           const endPayload = {
             type: 'end',
             finalMessage,
-            image: imageUrl,
+            images: imageUrls,
             requestId: sessionId
           };
           log('Streaming final message and closing connection', endPayload);
@@ -257,8 +303,9 @@ export async function POST(req: NextRequest) {
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive'
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'Transfer-Encoding': 'chunked'
       }
     });
   } catch (err) {

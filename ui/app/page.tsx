@@ -116,6 +116,13 @@ export default function Home() {
     );
   };
 
+  const LoadingSpinner = () => (
+    <div className="flex flex-col justify-center items-center py-10">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      <p className="text-blue-600 font-semibold">Loading agents...</p>
+    </div>
+  );
+
   return (
     <div>
       <Head>
@@ -124,7 +131,7 @@ export default function Home() {
       <div className="container p-4">
         <div className="flex flex-col items-center mb-4">
           <Image src="/images/aws-logo.svg" alt="AWS Logo" width={150} height={50} className="mb-4" />
-          <h1 className="text-2xl font-bold">Welcome to AWS HCLS Agents Catalog</h1>
+          <h1 className="text-2xl font-bold">Healthcare and Life Sciences Agent Catalog</h1>
         </div>
 
         {/* Filter Bar */}
@@ -151,11 +158,17 @@ export default function Home() {
         />
 
         {/* Agents Section */}
-        {(filter === 'all' || filter === 'collaborator') &&
-          renderAgents('Supervisors', isSupervisorType)}
+        {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              {(filter === 'all' || filter === 'collaborator') &&
+                renderAgents('Supervisors', isSupervisorType)}
 
-        {(filter === 'all' || filter === 'non-collaborator') &&
-          renderAgents('Individual Agents', (a) => a.agentCollaboration === 'DISABLED')}
+              {(filter === 'all' || filter === 'non-collaborator') &&
+                renderAgents('Individual Agents', (a) => a.agentCollaboration === 'DISABLED')}
+            </>
+          )}
 
 
         <div className="mt-6 flex justify-center gap-4">
