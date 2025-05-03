@@ -19,8 +19,7 @@ Parameters:
   RedshiftPassword:
     Type: String
     NoEcho: true
-    Default: 'MyPassword123'  
-    Description: 'The password for the Redshift master user. Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.'
+    Description: 'STORE SECURELY - The password for the Redshift master user. Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.'
     MinLength: 8
     MaxLength: 64
     AllowedPattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};:'",.<>?]{8,64}$
