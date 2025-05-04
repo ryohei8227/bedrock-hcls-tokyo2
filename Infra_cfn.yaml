@@ -600,6 +600,7 @@ Resources:
                 Action: 
                   - 'redshift-data:ExecuteStatement'
                   - 'redshift-data:GetStatementResult'
+                  - 'redshift:GetClusterCredentials'
                 Resource: 
                   - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:cluster:biomarker-redshift-cluster
                   - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:dbname:biomarker-redshift-cluster/dev

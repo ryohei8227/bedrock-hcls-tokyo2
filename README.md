@@ -23,7 +23,7 @@ The multi-agent solution overview is illustrated below.
 > Access to Amazon Bedrock foundation models (not granted by default). To gain access, follow the [official documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
 
-1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-cancer-biomarker-discovery](https://github.com/aws-samples/amazon-bedrock-agents-cancer-biomarker-discovery) repository to AWS CloudFormation. This template will set up:
+1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-healthcare-lifesciences](https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences) repository to AWS CloudFormation. This template will set up:
 > [!WARNING]  
 > Launching this stack will create 2 VPCs (Infrastructure and UI).
 
@@ -32,17 +32,20 @@ The multi-agent solution overview is illustrated below.
    - Bedrock Agent with Actions
    - Knowledgebase
    - Streamlit UI frontend
+   - React App UI frontend
 
-2. Deploy the `Infra_cfn.yaml` template:
+1. Deploy the `Infra_cfn.yaml` template:
    - Default parameter values can remain unchanged
    - Parameter descriptions:
      - `BedrockModelId`: ID of the Foundation Model for the Agent (permissions scoped to Anthropic Claude 3 Sonnet model)
      - `EnvironmentName`: Differentiates the application if launched in the same AWS account (lowercase, one number, max 5 characters)
      - `RedshiftDatabaseName`: Name for the Redshift database
      - `RedshiftUserName`: Username for Redshift database login
-     - `RedshiftPassword`: Password for Redshift database login
+     - `RedshiftPassword`: Password for Redshift database login [Store password securely]
      - `GithubLink`: Default repository for the Agent (do not change)
      - `ImageTag`: Tag of the Docker image for Streamlit UI deployment
+     - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed
+     - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create all agents.
 
 > [!NOTE]  
 > Full deployment takes approximately 10-15 minutes. Stack can also be launched in us-east-1 or us-west-2 by clicking launch stack below

@@ -67,6 +67,10 @@ Resources:
     Properties:
       GroupDescription: Access to the Fargate containers
       VpcId: !Ref VPCId
+      SecurityGroupEgress:
+        - Name: FargateSecurityGroupEgressRule
+          CidrIp: '0.0.0.0/0'
+          IpProtocol: -1
 
   EcsSecurityGroupIngressFromPublicALB:
     Type: AWS::EC2::SecurityGroupIngress
@@ -90,8 +94,12 @@ Resources:
       GroupDescription: Access to the public facing load balancer
       VpcId: !Ref VPCId
       SecurityGroupIngress:
-        - Name: SecurityGroupRule
-        - CidrList: !Ref AllowedCidr
+        - Name: PubLBSecurityGroupIngressRule
+          CidrIp: !Ref AllowedCidr
+          IpProtocol: -1
+      SecurityGroupEgress:
+        - Name: PubLBSecurityGroupEgressRule
+          CidrIp: '0.0.0.0/0'
           IpProtocol: -1
 
   PublicLoadBalancer:
