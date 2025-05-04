@@ -23,6 +23,7 @@ Resources:
       ImageTagMutability: MUTABLE
       EncryptionConfiguration:
         EncryptionType: AES256
+      EmptyOnDelete: True
 
   # CodeBuild Role
   CodeBuildDockerServiceRole:

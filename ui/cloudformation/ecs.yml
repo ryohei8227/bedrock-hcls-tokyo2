@@ -10,8 +10,8 @@ Parameters:
   VPCId:
     Type: String
     Description: The ID of the VPC in which to deploy
-  CidrIp:
-    Type: String
+  AllowedCidrList:
+    Type: CommaDelimitedList
     Description: The CIDR IP range to allow access to the ALB
   PublicSubnet1:
     Type: String
@@ -90,7 +90,9 @@ Resources:
       GroupDescription: Access to the public facing load balancer
       VpcId: !Ref VPCId
       SecurityGroupIngress:
-          - SourcePrefixListId: !Ref CidrIp
+        - !Transform
+          - Name: SecurityGroupRule
+          - CidrList: !Ref AllowedCidrList
             IpProtocol: -1
 
   PublicLoadBalancer:
