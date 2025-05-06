@@ -41,11 +41,11 @@ The multi-agent solution overview is illustrated below.
      - `EnvironmentName`: Differentiates the application if launched in the same AWS account (lowercase, one number, max 5 characters)
      - `RedshiftDatabaseName`: Name for the Redshift database
      - `RedshiftUserName`: Username for Redshift database login
-     - `RedshiftPassword`: Password for Redshift database login [Store password securely]
+     - `RedshiftPassword`: Password for Redshift database login [Remember and store password securely]
      - `GithubLink`: Default repository for the Agent (do not change)
      - `ImageTag`: Tag of the Docker image for Streamlit UI deployment
      - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed
-     - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create all agents.
+     - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create a subset of agents.
 
 > [!NOTE]  
 > Full deployment takes approximately 10-15 minutes. Stack can also be launched in us-east-1 or us-west-2 by clicking launch stack below
@@ -67,6 +67,7 @@ The multi-agent solution overview is illustrated below.
    1. Navigate to AWS CloudFormation via AWS Console search
    2. Click the Streamlit nested stack (format: `<stackname>-StreamlitBuildNestedStack-<123ABCXXXX>`)
    3. In the Outputs tab, find the CloudFrontURL link and add 'https://' to the beginning of the URL and paste in your browser
+   4. For the React App UI, 
 
 ## Model Context Protocol (MCP)
 

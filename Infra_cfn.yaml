@@ -600,10 +600,15 @@ Resources:
                 Action: 
                   - 'redshift-data:ExecuteStatement'
                   - 'redshift-data:GetStatementResult'
-                  - 'redshift:GetClusterCredentials'
                 Resource: 
                   - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:cluster:biomarker-redshift-cluster
-                  - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:dbname:biomarker-redshift-cluster/dev
+                  - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:dbname:biomarker-redshift-cluster/${RedshiftDatabaseName}
+              - Effect: 'Allow'
+                Action: 
+                  - 'redshift:GetClusterCredentials'
+                Resource: 
+                  - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:dbuser:biomarker-redshift-cluster/${RedshiftUserName}
+                  - !Sub arn:aws:redshift:${AWS::Region}:${AWS::AccountId}:dbname:biomarker-redshift-cluster/${RedshiftDatabaseName}
               
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
@@ -950,7 +955,13 @@ Resources:
       Type: Custom::TriggerAgentBuild
       Properties:
         ServiceToken: !GetAtt TriggerAgentBuildLambda.Arn
-        ProjectName: !Ref AgentandUICodeBuild
+        ProjectName: !Ref AgentCodeBuild
+  
+  TriggerReactAppBuildCustomResource:
+      Type: Custom::TriggerAgentBuild
+      Properties:
+        ServiceToken: !GetAtt TriggerAgentBuildLambda.Arn
+        ProjectName: !Ref ReactAppBuild
 
   TriggerAgentBuildLambda:
     Type: AWS::Lambda::Function
@@ -1070,7 +1081,9 @@ Resources:
               - Effect: Allow
                 Action: 
                   - codebuild:StartBuild
-                Resource: !GetAtt AgentandUICodeBuild.Arn
+                Resource: 
+                  - !GetAtt AgentCodeBuild.Arn
+                  - !GetAtt ReactAppCodeBuild.Arn
         - PolicyName: CloudWatchLogsPolicy
           PolicyDocument:
             Version: '2012-10-17'
@@ -1102,7 +1115,8 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-AgentandUIBuild:*
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-AgentBuild:*
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-ReactAppBuild:*
               - Effect: Allow
                 Action:
                   - s3:GetObject
@@ -1118,13 +1132,10 @@ Resources:
                   - !Sub arn:aws:s3:::${S3Bucket}
                   - !Sub arn:aws:s3:::${S3Bucket}/*
   
-
-
-  
-  AgentandUICodeBuild:
+  AgentCodeBuild:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub ${AWS::StackName}-AgentandUIBuild
+      Name: !Sub ${AWS::StackName}-AgentCodeBuild
       Description: "CodeBuild project to build and package agent CloudFormation templates"
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       TimeoutInMinutes: 15
@@ -1191,6 +1202,49 @@ Resources:
         ImageTag: !Ref ImageTag
         GitBranch: !Ref GitBranch
       TimeoutInMinutes: 35
+
+  ReactAppCodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${AWS::StackName}-ReactAppCodeBuild
+      Description: "CodeBuild project to build and React App CloudFormation templates"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      TimeoutInMinutes: 15
+      Artifacts:
+        Type: S3
+        Location: !Ref S3Bucket
+        Name: packaged_react_app
+        NamespaceType: NONE
+        Packaging: NONE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+      Source:
+        Type: NO_SOURCE
+        BuildSpec: !Sub |
+          version: 0.2
+          env:
+            variables:
+              S3_BUCKET: ${S3Bucket}
+              GIT_BRANCH: ${GitBranch}
+              GITHUB_LINK: ${GithubLink}
+          phases:
+            install:
+              runtime-versions:
+                python: 3.8
+            pre_build:
+              commands:
+                - echo Cloning the repository
+                - git clone -b $GIT_BRANCH --single-branch $GITHUB_LINK repo
+                - cd repo
+            build:
+              commands:
+                - echo Processing agent templates
+                - ./build_react_app.sh
+            post_build:
+              commands:
+                - echo Build completed on `date`
   ReactAppDockerBuildNestedStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: 
