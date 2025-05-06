@@ -961,7 +961,7 @@ Resources:
       Type: Custom::TriggerAgentBuild
       Properties:
         ServiceToken: !GetAtt TriggerAgentBuildLambda.Arn
-        ProjectName: !Ref ReactAppBuild
+        ProjectName: !Ref ReactAppCodeBuild
 
   TriggerAgentBuildLambda:
     Type: AWS::Lambda::Function
@@ -1115,8 +1115,8 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-AgentBuild:*
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-ReactAppBuild:*
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-AgentCodeBuild:*
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-ReactAppCodeBuild:*
               - Effect: Allow
                 Action:
                   - s3:GetObject
