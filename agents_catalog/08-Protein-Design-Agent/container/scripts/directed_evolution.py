@@ -68,7 +68,7 @@ def _parse_args():
     parser.add_argument(
         "--scorer_expert_name_or_path",
         help="Scoring model to use, specify 'None' to skip",
-        default='NREL/avGFP-fluorescence-onehot-cnn',
+        default='None',
         type=str,
     )
     parser.add_argument(
