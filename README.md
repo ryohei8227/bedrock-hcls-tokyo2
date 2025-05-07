@@ -22,7 +22,13 @@ Read more about these agents here:
 ## Solution Overview
 
 The multi-agent solution overview is illustrated below.
-![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg)
+
+![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg) 
+
+
+Details of how the underlying steps are orchestrated are illustrated in the diagram below:
+
+![flow](docs/src/assets/HCLSagents.jpg)
 
 ## Deployment
 
@@ -31,16 +37,18 @@ The multi-agent solution overview is illustrated below.
 > [!IMPORTANT]  
 > Access to Amazon Bedrock foundation models (not granted by default). To gain access, follow the [official documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
-1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-cancer-biomarker-discovery](https://github.com/aws-samples/amazon-bedrock-agents-cancer-biomarker-discovery) repository to AWS CloudFormation. This template will set up:
-
+1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-healthcare-lifesciences](https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences) repository to AWS CloudFormation. (Details of how to create a stack are shown [here](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html)).
+This template will set up:
 > [!WARNING]  
 > Launching this stack will create 2 VPCs (Infrastructure and UI).
 
-- Networking infrastructure (VPC, Subnets, etc.)
-- Amazon Redshift database
-- Bedrock Agent with Actions
-- Knowledgebase
-- Streamlit UI frontend
+   - Networking infrastructure (VPC, Subnets, etc.)
+   - Amazon Redshift database
+   - Bedrock Agent with Actions
+   - Knowledgebase
+   - Streamlit UI frontend
+   - React App UI frontend
+
 
 2. Deploy the `Infra_cfn.yaml` template:
    - Default parameter values can remain unchanged
@@ -49,17 +57,16 @@ The multi-agent solution overview is illustrated below.
      - `EnvironmentName`: Differentiates the application if launched in the same AWS account (lowercase, one number, max 5 characters)
      - `RedshiftDatabaseName`: Name for the Redshift database
      - `RedshiftUserName`: Username for Redshift database login
-     - `RedshiftPassword`: Password for Redshift database login
+     - `RedshiftPassword`: Password for Redshift database login [Remember and store password securely]
      - `GithubLink`: Default repository for the Agent (do not change)
      - `ImageTag`: Tag of the Docker image for Streamlit UI deployment
+     - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed
+     - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create a subset of agents.
 
 > [!NOTE]  
-> Full deployment takes approximately 10-15 minutes. Stack can also be launched in us-east-1 or us-west-2 by clicking launch stack below
+> Full deployment takes approximately 20-30 minutes. 
 
-|   Region   | Infra_cfn.yaml |
-| ---------- | ----------------- |
-| us-east-1  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
-| us-west-2  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
+
 
 3. After stack launch is successful manually sync the Knowledgebase:
    1. Navigate to the Bedrock dashboard via AWS Console search
@@ -69,10 +76,13 @@ The multi-agent solution overview is illustrated below.
    5. Scroll to the "Data Source" option box
    6. Select the data source (radio button) and click "Sync"
 
-4. Access the UI:
+4. Access the React UI:
    1. Navigate to AWS CloudFormation via AWS Console search
-   2. Click the Streamlit nested stack (format: `<stackname>-StreamlitBuildNestedStack-<123ABCXXXX>`)
-   3. In the Outputs tab, find the CloudFrontURL link and add 'https://' to the beginning of the URL and paste in your browser
+   2. Click the parent stack name that was chosen to deploy the `Infra_cfn.yaml`
+   3. In the Outputs tab, find the `ReactAppExternalURL` link and add 'https://' to the beginning of the URL and paste in your browser
+   4. You should be able to see a landing page with all (or a subset) deployed agents as shown in the screenshot below:
+   
+   ![react-app-landing-page](docs/src/assets/agents_list_react_app.png) 
 
 ## Model Context Protocol (MCP)
 
