@@ -972,7 +972,7 @@ Resources:
         ZipFile: |
           import boto3
           import cfnresponse
-
+          import time
           def handler(event, context):
               if event['RequestType'] in ['Create', 'Update']:
                   try:
@@ -981,6 +981,7 @@ Resources:
                       response = codebuild.start_build(projectName=project_name)
                       build_id = response['build']['id']
                       print(f"Build started: {build_id}")
+                      time.sleep(120)
                       cfnresponse.send(event, context, cfnresponse.SUCCESS, {"BuildId": build_id})
                   except Exception as e:
                       print(f"Error: {str(e)}")
@@ -1238,9 +1239,11 @@ Resources:
                 - echo Cloning the repository
                 - git clone -b $GIT_BRANCH --single-branch $GITHUB_LINK repo
                 - cd repo
+                - chmod +x build_react_app.sh
             build:
               commands:
-                - echo Processing agent templates
+                - echo Processing react app templates
+                - ls -la
                 - ./build_react_app.sh
             post_build:
               commands:
@@ -1248,7 +1251,8 @@ Resources:
   ReactAppDockerBuildNestedStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: 
-      - AgentBuildNestedStack
+      - ReactAppCodeBuild
+      - TriggerReactAppBuildCustomResource
     Properties:
       TemplateURL: !Sub https://${S3Bucket}.s3.${AWS::Region}.amazonaws.com/ui/docker_build_pipeline.yml
       Parameters:
@@ -1275,4 +1279,9 @@ Outputs:
   RedshiftClusterEndpoint:
     Description: Redshift Cluster Endpoint
     Value: !GetAtt RedshiftCluster.Endpoint.Address
-  
+  ReactAppExternalURL:
+    Value:
+      Fn::GetAtt:
+        - ReactAppEcsBuildNestedStack 
+        - Outputs.ExternalUrl
+    Description: ALB DNS for the React App 

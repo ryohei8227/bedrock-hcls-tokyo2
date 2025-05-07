@@ -29,3 +29,6 @@ if [ -d "ui" ] && [ -f "ui/cloudformation/ecs.yml" ]; then
   echo "Copying react app ECS build template"
   aws s3 cp "ui/cloudformation/ecs.yml" "s3://${S3_BUCKET}/ui/ecs.yml"
 fi
+
+
+echo "All UI artifacts and templates packaged and uploaded to S3"
