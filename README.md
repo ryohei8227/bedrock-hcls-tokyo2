@@ -4,7 +4,7 @@ Explore the following components in the repository:
 
 ## Agents catalog
 
-Library of specialized agents for different R&D workflows [agent-catalog](agents_catalog/)
+Library of specialized agents for common workflows across drug research, clinical trials, and commercialization [agent-catalog](agents_catalog/)
 
 ## Multi-agent collaboration
 
@@ -14,19 +14,7 @@ Framework for agent collaboration and knowledge sharing. End to end example for 
 
 Methods for assessing agent performance and result quality. End to end example for cancer biomarker discovery [evaluations](evaluations/README.md)
 
-## Accelerate analysis and discovery of cancer biomarkers with Agents for Bedrock
-
-Read more about these agents here:
-<https://aws.amazon.com/blogs/machine-learning/accelerate-analysis-and-discovery-of-cancer-biomarkers-with-amazon-bedrock-agents/>
-
-## Solution Overview
-
-The multi-agent solution overview is illustrated below.
-
-![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg) 
-
-
-Details of how the underlying steps are orchestrated are illustrated in the diagram below:
+The key components are illustrated in the diagram below:
 
 ![flow](docs/src/assets/HCLSagents.jpg)
 
@@ -37,7 +25,18 @@ Details of how the underlying steps are orchestrated are illustrated in the diag
 > [!IMPORTANT]  
 > Access to Amazon Bedrock foundation models (not granted by default). To gain access, follow the [official documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
 
-1. Upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-healthcare-lifesciences](https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences) repository to AWS CloudFormation. (Details of how to create a stack are shown [here](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html)).
+> [!NOTE]  
+> Full deployment takes approximately 20-30 minutes. 
+
+1. Stack can be launched in us-east-1 or us-west-2 by clicking launch stack below
+
+|   Region   | codepipeline.yaml |
+| ---------- | ----------------- |
+| us-east-1  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
+| us-west-2  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
+
+Alternatively, upload the `Infra_cfn.yaml` file from the [amazon-bedrock-agents-healthcare-lifesciences](https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences) repository to AWS CloudFormation. (Details of how to create a stack are shown [here](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html)).
+
 This template will set up:
 > [!WARNING]  
 > Launching this stack will create 2 VPCs (Infrastructure and UI).
@@ -63,11 +62,6 @@ This template will set up:
      - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed
      - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create a subset of agents.
 
-> [!NOTE]  
-> Full deployment takes approximately 20-30 minutes. 
-
-
-
 3. After stack launch is successful manually sync the Knowledgebase:
    1. Navigate to the Bedrock dashboard via AWS Console search
    2. Click the option icon (top left) to open the navigation bar
@@ -83,6 +77,15 @@ This template will set up:
    4. You should be able to see a landing page with all (or a subset) deployed agents as shown in the screenshot below:
    
    ![react-app-landing-page](docs/src/assets/agents_list_react_app.png) 
+
+## Multi-agent collaboration for cancer biomarker discovery
+
+Read more about sample agents to accelerate analysis and discovery of cancer biomarkers:
+<https://aws.amazon.com/blogs/machine-learning/accelerate-analysis-and-discovery-of-cancer-biomarkers-with-amazon-bedrock-agents/>
+
+The multi-agent solution overview of [Cancer biomarker discovery](multi_agent_collaboration/cancer_biomarker_discovery/README.md) is illustrated below.
+
+![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg) 
 
 ## Model Context Protocol (MCP)
 
@@ -142,7 +145,7 @@ Depending on your local environment, you may need to provide the full path to yo
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT-0 License.
 
 ## Legal Notes
 
