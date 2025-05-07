@@ -8,11 +8,11 @@ Library of specialized agents for common workflows across drug research, clinica
 
 ## Multi-agent collaboration
 
-Framework for agent collaboration and knowledge sharing. End to end example for cancer biomarker discovery [multi-agent](multi_agent_collaboration/cancer_biomarker_discovery/README.md)
+Framework for agent collaboration and knowledge sharing. End to end examples for cancer biomarker discovery, clinical trial protocol assistant, and competitive intelligence. [multi-agent](multi_agent_collaboration/cancer_biomarker_discovery/README.md)
 
 ## Evaluation
 
-Methods for assessing agent performance and result quality. End to end example for cancer biomarker discovery [evaluations](evaluations/README.md)
+Methods for assessing agent performance and result quality. Agent task and goal metrics for cancer biomarker discovery [evaluations](evaluations/README.md)
 
 The key components are illustrated in the diagram below:
 
@@ -20,7 +20,7 @@ The key components are illustrated in the diagram below:
 
 ## Deployment
 
-### Note: You can choose to deploy the agents with one-click deployment or set them up yourself in workshop mode
+### Note: You can choose to deploy some of the agents with one-click deployment or set them up yourself in workshop mode
 
 > [!IMPORTANT]  
 > Access to Amazon Bedrock foundation models (not granted by default). To gain access, follow the [official documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
@@ -30,7 +30,7 @@ The key components are illustrated in the diagram below:
 
 1. Stack can be launched in us-east-1 or us-west-2 by clicking launch stack below
 
-|   Region   | codepipeline.yaml |
+|   Region   | infra_cfn.yaml |
 | ---------- | ----------------- |
 | us-east-1  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
 | us-west-2  | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=biomakeragent&templateURL=https://aws-blogs-artifacts-public.s3.amazonaws.com/artifacts/ML-16901/Infra_cfn.yaml)|
