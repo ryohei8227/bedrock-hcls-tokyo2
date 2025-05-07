@@ -14,7 +14,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
@@ -50,7 +50,9 @@ Resources:
   WebSearchLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.12
+      FunctionName: TavilyWebSearch
+      Description: "Search the web with { 'search_query' } parameter. Optional { 'days' } parameter for days of history to search and { 'topic' } parameter for either 'news' or 'general' content type."
+      Runtime: python3.13
       Handler: index.lambda_handler
       Role: !GetAtt WebSearchLambdaRole.Arn
       Timeout: 30
@@ -62,6 +64,9 @@ Resources:
             - "TAVILY_API_KEY_${StackId}"
             - StackId: !Select [2, !Split ["/", !Ref AWS::StackId]]
       Code: "action-groups/web-search"
+      Tags:
+        - Key: Application
+          Value: HCLSAgents
 
   WebSearchLambdaRole:
     Type: AWS::IAM::Role
@@ -143,17 +148,7 @@ Resources:
                     Description: "The number of days of history to search. Helps when looking for recent events or news."
                     Type: string
                     Required: False
-      AgentName:
-        !Join [
-          "-",
-          [
-            "web-search-agent",
-            !Select [
-              4,
-              !Split ["-", !Select [2, !Split ["/", !Ref "AWS::StackId"]]],
-            ],
-          ],
-        ]
+      AgentName: Tavily-Web-Search-Agent
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Answer questions by searching the internet."
@@ -232,11 +227,10 @@ Resources:
           - Type: PROFANITY
 
 Outputs:
-  AgentId: 
+  AgentId:
     Description: Agent ID
     Value: !Ref WebSearchAgent
-  AgentAliasId: 
+  AgentAliasId:
     Description: Agent Alias ID
-    Value: !GetAtt  AgentAliasResource.AgentAliasId
+    Value: !GetAtt AgentAliasResource.AgentAliasId
     Condition: CreateAgentAliasCondition
-

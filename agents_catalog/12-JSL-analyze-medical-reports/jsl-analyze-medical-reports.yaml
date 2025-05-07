@@ -7,10 +7,18 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
+  ExtractSocialDeterminantsofHealthModelProductArn:
+    Type: String
+    Default: "arn:aws:sagemaker:us-west-2:594846645681:model-package/explain-clinical-doc-sdoh-smal-fab58541a660355ebc1955b85ed4925d"
+    Description: The arn for the Extract Social Determinants of Health Model
+  ICD10CMSentenceEntityResolverModelProductArn:
+    Type: String
+    Default: "arn:aws:sagemaker:us-west-2:594846645681:model-package/icd10cm-vdb-resolver-5-5-4-2f17a4cf4c9a3d5c9c77b1fe0ed78900"
+    Description: The arn for the ICD10CM Sentence Entity Resolver Model
 
 Conditions:
   CreateAgentAliasCondition: !Not [!Equals [!Ref AgentAliasName, ""]]
@@ -26,7 +34,7 @@ Resources:
       TemplateURL: "sagemaker-marketplace-endpoint.yaml"
       Parameters:
         EndPointName: "JSL-Extract-Social-Determinants-of-Health"
-        ProductARN: "arn:aws:sagemaker:us-west-2:594846645681:model-package/explain-clinical-doc-sdoh-smal-fab58541a660355ebc1955b85ed4925d"
+        ProductARN: !Ref ExtractSocialDeterminantsofHealthModelProductArn
         InstanceType: "ml.m4.xlarge"
         InstanceCount: "1"
 
@@ -36,7 +44,7 @@ Resources:
       TemplateURL: "sagemaker-marketplace-endpoint.yaml"
       Parameters:
         EndPointName: "ICD-10-CM-Sentence-Entity-Resolver"
-        ProductARN: "arn:aws:sagemaker:us-west-2:594846645681:model-package/icd10cm-vdb-resolver-5-5-4-2f17a4cf4c9a3d5c9c77b1fe0ed78900"
+        ProductARN: !Ref ICD10CMSentenceEntityResolverModelProductArn
         InstanceType: "ml.m4.xlarge"
         InstanceCount: "1"
 
@@ -136,7 +144,7 @@ Resources:
                     Description: "Unstructured medical text"
                     Type: string
                     Required: True
-      AgentName: jsl-analyze-medical-reports
+      AgentName: John-Snow-Labs-Analyze-Medical-Reports
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
       Description: "Extract adverse drug events from unstructured clinical texts"

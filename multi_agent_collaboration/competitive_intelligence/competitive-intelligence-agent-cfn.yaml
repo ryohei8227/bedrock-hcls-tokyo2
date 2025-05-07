@@ -7,7 +7,7 @@ Parameters:
   BedrockModelId:
     Type: String
     Description: The ID of the Foundation Model to use for the Agent
-    Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+    Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
     Description: The arn for the agent IAM role
@@ -17,6 +17,9 @@ Parameters:
   SEC10kAgentAliasArn:
     Type: String
     Description: The arn for the SE 10-K search sub agent
+  USPTOAgentAliasArn:
+    Type: String
+    Description: The arn for the USPTO search sub agent    
 
 Conditions:
   CreateAgentAliasCondition: !Not [!Equals [!Ref AgentAliasName, ""]]
@@ -59,21 +62,18 @@ Resources:
               - Balance sheet metrics
               - Cash flow information
               - Debt levels and financing activities
+        - CollaboratorName: USPTO-Search-Agent
+          AgentDescriptor:
+            AliasArn: !Ref USPTOAgentAliasArn
+          CollaborationInstruction: |
+            Use USPTO Search Agent when you need information about patent applications, such as:
+              - Recent patent applications on given topic
+              - The inventor, filing date, or applicant of a given patent
 
-      AgentName:
-        !Join [
-          "-",
-          [
-            "competitive-intelligence-agent",
-            !Select [
-              4,
-              !Split ["-", !Select [2, !Split ["/", !Ref "AWS::StackId"]]],
-            ],
-          ],
-        ]
+      AgentName: Competitive-Intelligence-Agent
       AgentResourceRoleArn: !Ref AgentIAMRoleArn
       AutoPrepare: True
-      Description: "Analyze business news and SEC 10-K filings"
+      Description: "Analyze business, financial, and patent information using search"
       FoundationModel: !Ref BedrockModelId
       GuardrailConfiguration:
         GuardrailIdentifier: !GetAtt Guardrail.GuardrailId
@@ -84,10 +84,11 @@ Resources:
 
         Your Capabilities:
 
-        You can coordinate two specialized sub-agents to gather information:
+        You can coordinate three specialized sub-agents to gather information:
 
             - Web Search Agent: Can retrieve recent news articles, press releases, analyst reports, and media coverage about target companies
             - SEC Filing Agent: Can extract and analyze data from SEC 10-K filings
+            - USPTO Search Agent: Can retrieve and analyze patent applications from the USPTO
 
         Report Structure:
 
@@ -112,10 +113,11 @@ Resources:
             1. First, understand the specific company the user wants analyzed
             2. Instruct the Web Search Agent to find recent news about the company (last 3-6 months)
             3. Direct the SEC Filing Agent to retrieve relevant data about profit and loss from the previous 5 years of 10-K filings
-            4. Synthesize information from both sources into a cohesive narrative
-            5. Identify patterns, anomalies, and strategically significant insights
-            6. Present findings objectively with relevant quantitative data
-            7. Format the report professionally with clear section headings
+            4. Ask the USPTO search agent to find patent applications from the past 365 days with the name of the company or any research topics identified in the web search
+            5. Synthesize information from all sources into a cohesive narrative
+            6. Identify patterns, anomalies, and strategically significant insights
+            7. Present findings objectively with relevant quantitative data
+            8. Format the report professionally with clear section headings
 
         Guidelines:
 
