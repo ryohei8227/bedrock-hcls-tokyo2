@@ -59,9 +59,9 @@ This template will set up:
      - `RedshiftPassword`: Password for Redshift database login [Remember and store password securely]
      - `GithubLink`: Default repository for the Agent (do not change)
      - `ImageTag`: Tag of the Docker image for Streamlit UI deployment
-     - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed
      - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create a subset of agents.
-
+     - `ReactAppAllowedCidr`: CIDR range from where access to the React UI is allowed. Learn about best practices in the AWS VPC [documentation](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html).
+ 
 3. After stack launch is successful manually sync the Knowledgebase:
    1. Navigate to the Bedrock dashboard via AWS Console search
    2. Click the option icon (top left) to open the navigation bar
