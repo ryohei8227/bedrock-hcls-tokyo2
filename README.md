@@ -4,15 +4,15 @@ Explore the following components in the repository:
 
 ## Agents catalog
 
-Library of specialized agents for common workflows across drug research, clinical trials, and commercialization [agent-catalog](agents_catalog/README.md)
+Library of specialized agents for common workflows across drug research, clinical trials, and commercialization [agent-catalog](agents_catalog/)
 
 ## Multi-agent collaboration
 
-Framework for agent collaboration and knowledge sharing. End to end examples for cancer biomarker discovery, clinical trial protocol assistant, and competitive intelligence. [multi-agent](multi_agent_collaboration/README.md)
+Framework for agent collaboration and knowledge sharing. End to end examples for cancer biomarker discovery, clinical trial protocol assistant, and competitive intelligence. [multi-agent-collaboration](multi_agent_collaboration/)
 
 ## Evaluation
 
-Methods for assessing agent performance and result quality. Agent task and goal metrics for cancer biomarker discovery [evaluations](evaluations/README.md)
+Methods for assessing agent performance and result quality. Agent task and goal metrics for cancer biomarker discovery [evaluations](evaluations/)
 
 The key components are illustrated in the diagram below:
 
