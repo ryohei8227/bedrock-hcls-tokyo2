@@ -57,6 +57,7 @@ This template will set up:
      - `RedshiftDatabaseName`: Name for the Redshift database
      - `RedshiftUserName`: Username for Redshift database login
      - `RedshiftPassword`: Password for Redshift database login [Remember and store password securely]
+          - `Note` : Redshift Only printable ASCII characters except for '/', '@', '"', ' ', '', ''' may be used
      - `GithubLink`: Default repository for the Agent (do not change)
      - `ImageTag`: Tag of the Docker image for Streamlit UI deployment
      - `MultiAgentDevMode`: Select True to use a python notebook to manually create the agents step by step. Select false to auto create a subset of agents.
