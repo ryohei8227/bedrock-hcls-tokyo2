@@ -1,5 +1,5 @@
 # Step 1: Use Node.js base image
-FROM --platform=linux/amd64 node:18-alpine AS builder
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:18-alpine3.21 AS builder
 
 # Set working directory
 WORKDIR /app
@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # Step 2: Create a lightweight production image
-FROM --platform=linux/amd64 node:18-alpine
+FROM --platform=linux/amd64 public.ecr.aws/docker/library/node:18-alpine3.21
 
 WORKDIR /app
 
