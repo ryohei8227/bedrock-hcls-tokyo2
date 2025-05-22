@@ -39,7 +39,7 @@ Parameters:
   GitBranch:
     Type: String
     Description: The github branch to clone
-    Default: main
+    Default: biomarker-agents-restructure
   SubAgentS3Bucket:
     Type: String
     Description: "The S3 bucket containing the Subagents"
@@ -302,15 +302,15 @@ Resources:
                 - echo "Cloning Git repository..."
                 - GIT_LFS_SKIP_SMUDGE=1 git clone -b ${GitBranch} --single-branch ${GitRepoURL} repo
                 - echo "Zipping Lambda function..."
-                - cd ActionGroups/matplotbarchartlambda
+                - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r matplotbarchartlambda.zip $items_to_zip
                 - cd ../..
                 - echo "Moving zip file to project root..."
-                - mv ActionGroups/matplotbarchartlambda/matplotbarchartlambda.zip .
+                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda/matplotbarchartlambda.zip .
                 - aws s3 cp matplotbarchartlambda.zip s3://${S3Bucket}/matplotbarchartlambda.zip
-                - cd repo/ActionGroups/pubmed-lambda-function
+                - cd repo/multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - echo "Creating zip pubmed lambda file..."
@@ -318,23 +318,23 @@ Resources:
                 - echo "Lambda function zipped"
                 - cd ../..
                 - echo "Moving zip file to project root..."
-                - mv ActionGroups/pubmed-lambda-function/pubmed-lambda-function.zip .
+                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function/pubmed-lambda-function.zip .
                 - aws s3 cp pubmed-lambda-function.zip s3://${S3Bucket}/pubmed-lambda-function.zip
-                - cd ActionGroups/querydatabaselambda
+                - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r querydatabaselambda.zip $items_to_zip
                 - cd ../..
                 - echo "Moving zip file to project root..."
-                - mv ActionGroups/querydatabaselambda/querydatabaselambda.zip .
+                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda/querydatabaselambda.zip .
                 - aws s3 cp querydatabaselambda.zip s3://${S3Bucket}/querydatabaselambda.zip
-                - cd ActionGroups/survivaldataprocessinglambda
+                - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r survivaldataprocessinglambda.zip $items_to_zip
                 - cd ../..
                 - echo "Moving zip file to project root..."
-                - mv ActionGroups/survivaldataprocessinglambda/survivaldataprocessinglambda.zip .
+                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda/survivaldataprocessinglambda.zip .
                 - aws s3 cp survivaldataprocessinglambda.zip s3://${S3Bucket}/survivaldataprocessinglambda.zip
                 - echo "Build phase completed"
                 - echo "lambda layer preperation phase starts"
@@ -381,7 +381,7 @@ Resources:
                 - echo "Starting build phase"
                 - echo "Cloning Git repository..."
                 - GIT_LFS_SKIP_SMUDGE=1 git clone -b ${GitBranch} --single-branch ${GitRepoURL} repo
-                - cd repo/ActionGroups/scientific-plots-with-lifelines
+                - cd repo/multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/scientific-plots-with-lifelines
                 - echo "Building Docker image..."
                 - docker build -t lifelines-python3.12-v2 .
                 - echo "Tagging Docker image..."
@@ -427,7 +427,7 @@ Resources:
                 - aws ecr get-login-password --region ${AWS::Region} | docker login --username AWS --password-stdin ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com
                 - echo Cloning the repository...
                 - git clone -b ${GitBranch} --single-branch ${GitRepoURL} repo
-                - cd repo/ActionGroups/imaging-biomarker 
+                - cd repo/multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/imaging-biomarker 
                 - echo Checking for required files...
                 - ls -la
                 - if [ ! -f requirements.txt ] || [ ! -f dcm2nifti_processing.py ] || [ ! -f radiomics_utils.py ]; then echo "Missing required files"; exit 1; fi

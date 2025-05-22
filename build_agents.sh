@@ -4,8 +4,8 @@
 echo "Current directory: $(pwd)"
 echo "S3 Bucket: ${S3_BUCKET}"
 
-# Process Subagent templates
-cd agents || exit
+# Process Cancer biomarker discovery Subagent templates
+cd multi_agent_collaboration/cancer_biomarker_discovery/agents || exit
 echo "Processing agent templates..."
 for agent_file in *.yaml; do
   if [ -f "${agent_file}" ]; then
@@ -23,8 +23,8 @@ for agent_file in *.yaml; do
 done
 cd ..
 
-# Process Supervisor agent template - note the quotes around directory name
-cd SupervisorAgent || exit
+# Process Cancer Biomarker discovery Supervisor agent template - note the quotes around directory name
+cd multi_agent_collaboration/cancer_biomarker_discovery/SupervisorAgent || exit
 echo "Processing supervisor agent template..."
 if [ -f "supervisor_agent.yaml" ]; then
   echo "Packaging supervisor agent"
