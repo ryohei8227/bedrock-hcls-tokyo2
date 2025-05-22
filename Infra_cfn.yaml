@@ -38,7 +38,7 @@ Parameters:
   GitBranch:
     Type: String
     Description: The github branch to clone
-    Default: biomarker-agents-restructure
+    Default: main
   ReactAppAllowedCidr:
     Type: String
     Description: "Allowed CIDR block (X.X.X.X/X) for React App UI access"
