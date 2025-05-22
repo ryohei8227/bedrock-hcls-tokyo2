@@ -32,7 +32,7 @@ Request access to the following Amazon Bedrock foundation models using the [offi
 
 ### 2. Request service quota increase
 
-Request an increase of the Amazon Bedrock "Parameters per function" quota to at least 10.
+[Request an increase](https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html#quota-console-increase) of the Amazon Bedrock "Parameters per function" quota to at least 10.
 
 ### 3. Deploy the toolkit application and agents for your preferred region
 
@@ -41,6 +41,24 @@ Choose _Launch Stack_ for your preferred region to deploy the toolkit applicatio
 | Name | us-east-1 | us-west-2 |
 | -- | ---------- | ----------------- |
 | All resources | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=hcls-agent-toolkit&templateURL=https://aws-hcls-ml.s3.us-east-1.amazonaws.com/public_assets_support_materials/hcls_agents_toolkit/Infra_cfn.yaml) | [![launch-stack](https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=biomakeragent&templateURL=https://aws-hcls-ml.s3.us-east-1.amazonaws.com/public_assets_support_materials/hcls_agents_toolkit/Infra_cfn.yaml) |
+
+This will deploy the following agents:
+
+- Cancer Biomarker Discovery (Multi-Agent Supervisor)
+- Biomarker Database Analyst
+- Clinical Evidence Researcher
+- Medical Imaging Expert
+- Statistician
+- Clinical Trial Protocol Assistant (Multi-Agent Supervisor)
+- Clinical Study Research Agent
+- Clinical Trial Protocol Generator Agent
+- Wiley Open Access Life Sciences Agent
+
+In most cases, you may leave the default template parameters unchanged. However, several parameters require new values:
+
+- **ReactAppAllowedCidr**: CIDR range from where access to the React UI is allowed. Learn about best practices in the [AWS VPC documentation](https://aws.amazon.com/what-is/cidr/). To restrict React App UI access to just your IP, first find your IP address through public websites such as [WhatIsMyIpAddress](https://whatismyipaddress.com/) and suffix it with 32. For example, if your ip adress is `192.0.2.0` the minimal CIDR range would be `192.0.2.0/32`.
+
+- **RedshiftPassword**: Password for Redshift database login. Remember and store password securely. Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number. Only printable ASCII characters, spaces, and the `/`, `@`, `"`, and `'` values may be used.
 
 ### 4. Access the toolkit application
 
