@@ -53,6 +53,10 @@ This will deploy the following agents:
 - Clinical Study Research Agent
 - Clinical Trial Protocol Generator Agent
 - Wiley Open Access Life Sciences Agent
+- Competitive Intelligence (Multi-Agent Supervisor)
+- SEC 10-K Search Agent
+- Tavily Web Search Agent
+- USPTO Search Agent
 
 In most cases, you may leave the default template parameters unchanged. However, several parameters require new values:
 
