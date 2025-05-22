@@ -133,18 +133,10 @@ Resources:
                   aliases = client.list_agent_aliases(agentId=agent_id)
                   
                   # Delete each alias
-                  attempt = 0
                   for alias in aliases['agentAliasSummaries']:
-                      try:
-                        client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])                  
-                      except Exception as e:
-                        print(f"Error {attempt} at deleting aliases: {str(e)}")
-                        if attempt == 0:
-                          attempt += 1
-                          print("Ignoring error for now...")
-                          continue
-                        else:
-                          raise
+                      if alias['agentAliasId'] != 'TSTALIASID':
+                        client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])
+        
                   
                   print(f"All aliases for agent {agent_id} have been deleted.")
               except Exception as e:
