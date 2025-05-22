@@ -22,6 +22,8 @@ for agent_file in *.yaml; do
   fi
 done
 cd ..
+cd ..
+cd ..
 
 # Process Cancer Biomarker discovery Supervisor agent template - note the quotes around directory name
 cd multi_agent_collaboration/cancer_biomarker_discovery/SupervisorAgent || exit
@@ -36,6 +38,8 @@ if [ -f "supervisor_agent.yaml" ]; then
   # Copy to S3 immediately after packaging
   aws s3 cp "../packaged_supervisor_agent.yaml" "s3://${S3_BUCKET}/packaged_supervisor_agent.yaml"
 fi
+cd ..
+cd ..
 cd ..
 
 # Process agent build template

@@ -134,7 +134,9 @@ Resources:
                   
                   # Delete each alias
                   for alias in aliases['agentAliasSummaries']:
-                      client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])
+                      if alias['agentAliasId'] != 'TSTALIASID':
+                        client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])
+        
                   
                   print(f"All aliases for agent {agent_id} have been deleted.")
               except Exception as e:

@@ -297,7 +297,7 @@ Resources:
                 - echo "Downloading NCBI article..."
                 - wget --user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5749594/pdf/radiol.2017161845.pdf -O ncbi_article.pdf
                 - echo "Uploading NCBI article to S3..."
-                - aws s3 cp ncbi_article.pdf s3://${S3Bucket}/ncbi_article.pdf
+                - aws s3 cp s3://aws-hcls-ml/literature/ncbi_article.pdf s3://${S3Bucket}/ncbi_article.pdf
                 - echo "NCBI article uploaded to S3"
                 - echo "Cloning Git repository..."
                 - GIT_LFS_SKIP_SMUDGE=1 git clone -b ${GitBranch} --single-branch ${GitRepoURL} repo
@@ -306,7 +306,7 @@ Resources:
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r matplotbarchartlambda.zip $items_to_zip
-                - cd ../..
+                - cd ../../../..
                 - echo "Moving zip file to project root..."
                 - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda/matplotbarchartlambda.zip .
                 - aws s3 cp matplotbarchartlambda.zip s3://${S3Bucket}/matplotbarchartlambda.zip
@@ -316,7 +316,7 @@ Resources:
                 - echo "Creating zip pubmed lambda file..."
                 - zip -r pubmed-lambda-function.zip $items_to_zip
                 - echo "Lambda function zipped"
-                - cd ../..
+                - cd ../../../..
                 - echo "Moving zip file to project root..."
                 - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function/pubmed-lambda-function.zip .
                 - aws s3 cp pubmed-lambda-function.zip s3://${S3Bucket}/pubmed-lambda-function.zip
@@ -324,7 +324,7 @@ Resources:
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r querydatabaselambda.zip $items_to_zip
-                - cd ../..
+                - cd ../../../..
                 - echo "Moving zip file to project root..."
                 - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda/querydatabaselambda.zip .
                 - aws s3 cp querydatabaselambda.zip s3://${S3Bucket}/querydatabaselambda.zip
@@ -332,7 +332,7 @@ Resources:
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r survivaldataprocessinglambda.zip $items_to_zip
-                - cd ../..
+                - cd ../../../..
                 - echo "Moving zip file to project root..."
                 - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda/survivaldataprocessinglambda.zip .
                 - aws s3 cp survivaldataprocessinglambda.zip s3://${S3Bucket}/survivaldataprocessinglambda.zip
