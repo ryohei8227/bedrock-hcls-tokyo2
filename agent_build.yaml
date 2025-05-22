@@ -603,6 +603,13 @@ Resources:
                 Resource:
                   - !GetAtt S3Bucket.Arn
                   - !Sub "${S3Bucket.Arn}/*"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - "arn:aws:s3:::aws-hcls-ml"
+                  - "arn:aws:s3:::aws-hcls-ml/*"
         - PolicyName: CloudWatchLogs
           PolicyDocument:
             Version: "2012-10-17"
