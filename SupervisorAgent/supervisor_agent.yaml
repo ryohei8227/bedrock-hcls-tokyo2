@@ -133,7 +133,7 @@ Resources:
                   aliases = client.list_agent_aliases(agentId=agent_id)
                   
                   # Delete each alias
-                  attampt = 0
+                  attempt = 0
                   for alias in aliases['agentAliasSummaries']:
                       try:
                         client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])                  
