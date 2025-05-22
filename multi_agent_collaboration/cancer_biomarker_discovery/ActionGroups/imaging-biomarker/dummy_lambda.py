@@ -6,6 +6,7 @@ import io
 import pandas as pd
 import os
 import ast
+from botocore.config import Config  
 
 # Get environment variables
 sfn_statemachine_name = os.environ['SFN_STATEMACHINE_NAME']
@@ -86,6 +87,7 @@ def lambda_handler(event, context):
     elif function == "analyze_imaging_biomarker":
         subject_id = None
         result = []
+        presigned_url = ' '
         s3_client = boto3.client('s3')
         for param in parameters:
             if param["name"] == "subject_id":
@@ -121,13 +123,29 @@ def lambda_handler(event, context):
         
                         print(json_data)
                         result = result + json.loads(json_data)
+
+                        #s3_client = boto3.client('s3')
+                        s3_client = boto3.client('s3',config=Config(signature_version='s3v4'))
+                        print(bucket_name)
+                        KEY = f'nsclc_radiogenomics/PNG/{id}_ortho-view.png'
+                        print(KEY)
+                        presigned_url = presigned_url + ' and ' + s3_client.generate_presigned_url('get_object',
+                                Params={'Bucket': bucket_name, 'Key': KEY},
+                                ExpiresIn=3600
+                            )
+                        print(presigned_url)
         
                     except Exception as e:
-                        print(f'Error: {e}')
+                        print(f"[ERROR] Exception occurred: {str(e)}")
+                        response_body = {
+                            "TEXT": {
+                                "body": f"An error occurred: {str(e)}"
+                            }
+                        }
         
         response_body = {
             "TEXT": {
-                'body': str(result)
+                'body': f". Lung CT segmentation saved at the following URL: {presigned_url} . The analysis job results are: " + str(result)
             }
         }
     
