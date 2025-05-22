@@ -304,15 +304,18 @@ Resources:
                 - echo "Cloning Git repository..."
                 - GIT_LFS_SKIP_SMUDGE=1 git clone -b ${GitBranch} --single-branch ${GitRepoURL} repo
                 - echo "Zipping Lambda function..."
+                - cd repo
                 - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r matplotbarchartlambda.zip $items_to_zip
                 - cd ../../../..
                 - echo "Moving zip file to project root..."
-                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda/matplotbarchartlambda.zip .
+                - cp multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/matplotbarchartlambda/matplotbarchartlambda.zip ../
+                - cd ..
                 - aws s3 cp matplotbarchartlambda.zip s3://${S3Bucket}/matplotbarchartlambda.zip
-                - cd repo/multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function
+                - cd repo
+                - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - echo "Creating zip pubmed lambda file..."
@@ -320,29 +323,37 @@ Resources:
                 - echo "Lambda function zipped"
                 - cd ../../../..
                 - echo "Moving zip file to project root..."
-                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function/pubmed-lambda-function.zip .
+                - cp multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/pubmed-lambda-function/pubmed-lambda-function.zip ../
+                - cd ..
                 - aws s3 cp pubmed-lambda-function.zip s3://${S3Bucket}/pubmed-lambda-function.zip
+                - cd repo
                 - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r querydatabaselambda.zip $items_to_zip
                 - cd ../../../..
                 - echo "Moving zip file to project root..."
-                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda/querydatabaselambda.zip .
+                - cp multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/querydatabaselambda/querydatabaselambda.zip ../
+                - cd ..
                 - aws s3 cp querydatabaselambda.zip s3://${S3Bucket}/querydatabaselambda.zip
+                - cd repo
                 - cd multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda
                 - echo "Creating list of items to zip..."
                 - items_to_zip=$(ls -A | tr '\n' ' ')
                 - zip -r survivaldataprocessinglambda.zip $items_to_zip
                 - cd ../../../..
                 - echo "Moving zip file to project root..."
-                - mv multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda/survivaldataprocessinglambda.zip .
+                - cp multi_agent_collaboration/cancer_biomarker_discovery/ActionGroups/survivaldataprocessinglambda/survivaldataprocessinglambda.zip ../
+                - cd ..
                 - aws s3 cp survivaldataprocessinglambda.zip s3://${S3Bucket}/survivaldataprocessinglambda.zip
                 - echo "Build phase completed"
                 - echo "lambda layer preperation phase starts"
+                - cd repo
                 - mkdir -p python
                 - pip install -r lambdalayers/requirements.txt -t python
                 - zip -r9 lambda-layer.zip python
+                - cp lambda-layer.zip ../
+                - cd ..
                 - aws s3 cp lambda-layer.zip s3://${S3Bucket}/lambda-layer.zip
 
       TimeoutInMinutes: 10
