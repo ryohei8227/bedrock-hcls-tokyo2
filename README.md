@@ -32,7 +32,7 @@ Request access to the following Amazon Bedrock foundation models using the [offi
 
 ### 2. Request service quota increase
 
-Request an increase of the Amazon Bedrock "Parameters per function" quota to at least 10.
+[Request an increase](https://docs.aws.amazon.com/servicequotas/latest/userguide/request-quota-increase.html#quota-console-increase) of the Amazon Bedrock "Parameters per function" quota to at least 10.
 
 ### 3. Deploy the toolkit application and agents for your preferred region
 
