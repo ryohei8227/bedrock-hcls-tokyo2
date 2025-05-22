@@ -147,7 +147,7 @@ Resources:
                   if event['RequestType'] in ['Create', 'Update']:
                       
                       response = client.create_agent(
-                          agentName='Supervisoragent',
+                          agentName='Biomarker-discovery-assistant',
                           agentResourceRoleArn=event['ResourceProperties']['RoleArn'],
                           description='Multi-agent collaboration for biomarker discovery',
                           foundationModel='us.anthropic.claude-3-5-sonnet-20241022-v2:0',
