@@ -136,7 +136,12 @@ def lambda_handler(event, context):
                         print(presigned_url)
         
                     except Exception as e:
-                        print(f'Error: {e}')
+                        print(f"[ERROR] Exception occurred: {str(e)}")
+                        response_body = {
+                            "TEXT": {
+                                "body": f"An error occurred: {str(e)}"
+                            }
+                        }
         
         response_body = {
             "TEXT": {
