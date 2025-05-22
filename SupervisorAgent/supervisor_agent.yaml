@@ -138,9 +138,10 @@ Resources:
                       try:
                         client.delete_agent_alias(agentId=agent_id, agentAliasId=alias['agentAliasId'])                  
                       except Exception as e:
-                        print(f"Error deleting aliases: {str(e)}")
+                        print(f"Error {attempt} at deleting aliases: {str(e)}")
                         if attempt == 0:
                           attempt += 1
+                          print("Ignoring error for now...")
                           continue
                         else:
                           raise
