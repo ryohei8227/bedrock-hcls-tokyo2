@@ -24,7 +24,7 @@ Parameters:
   S3CodeKey:
     Description: S3 key for the zip file containing CodeBuild code
     Type: String
-    Default: "sec-10-k-docker.zip"
+    Default: "agents_catalog/sec-10-k-docker.zip"
   ContainerName:
     Description: Name of the ECR project
     Type: String

@@ -53,12 +53,19 @@ This will deploy the following agents:
 - Clinical Study Research Agent
 - Clinical Trial Protocol Generator Agent
 - Wiley Open Access Life Sciences Agent
+- Competitive Intelligence (Multi-Agent Supervisor)
+- SEC 10-K Search Agent
+- Tavily Web Search Agent
+- USPTO Search Agent
 
 In most cases, you may leave the default template parameters unchanged. However, several parameters require new values:
 
 - **ReactAppAllowedCidr**: CIDR range from where access to the React UI is allowed. Learn about best practices in the [AWS VPC documentation](https://aws.amazon.com/what-is/cidr/). To restrict React App UI access to just your IP, first find your IP address through public websites such as [WhatIsMyIpAddress](https://whatismyipaddress.com/) and suffix it with 32. For example, if your ip adress is `192.0.2.0` the minimal CIDR range would be `192.0.2.0/32`.
 
 - **RedshiftPassword**: Password for Redshift database login. Remember and store password securely. Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number. Only printable ASCII characters, spaces, and the `/`, `@`, `"`, and `'` values may be used.
+
+- **TavilyApiKey**: API key for the Tavily web search API. Required to deploy the Tavily Web Search and Competitive Intelligence Supervisor agents. Please visit [tavily.com](https://tavily.com/) to create a account and generate an API key.
+- **USPTOApiKey**: API key for the US Patent and Trademark Office (USPTO) Open Data Portal. Required to deploy the USPTO Search and Competitive Intelligence Supervisor agents. Please visit the [USPO Open Data Portal](https://data.uspto.gov/apis/getting-started) to create a account and generate an API key.
 
 ### 4. Access the toolkit application
 
