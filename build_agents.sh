@@ -4,8 +4,8 @@
 echo "Current directory: $(pwd)"
 echo "S3 Bucket: ${S3_BUCKET}"
 
-# Process Subagent templates
-cd agents || exit
+# Process Cancer biomarker discovery Subagent templates
+cd multi_agent_collaboration/cancer_biomarker_discovery/agents || exit
 echo "Processing agent templates..."
 for agent_file in *.yaml; do
   if [ -f "${agent_file}" ]; then
@@ -22,9 +22,11 @@ for agent_file in *.yaml; do
   fi
 done
 cd ..
+cd ..
+cd ..
 
-# Process Supervisor agent template - note the quotes around directory name
-cd SupervisorAgent || exit
+# Process Cancer Biomarker discovery Supervisor agent template - note the quotes around directory name
+cd multi_agent_collaboration/cancer_biomarker_discovery/SupervisorAgent || exit
 echo "Processing supervisor agent template..."
 if [ -f "supervisor_agent.yaml" ]; then
   echo "Packaging supervisor agent"
@@ -36,6 +38,8 @@ if [ -f "supervisor_agent.yaml" ]; then
   # Copy to S3 immediately after packaging
   aws s3 cp "../packaged_supervisor_agent.yaml" "s3://${S3_BUCKET}/packaged_supervisor_agent.yaml"
 fi
+cd ..
+cd ..
 cd ..
 
 # Process agent build template
