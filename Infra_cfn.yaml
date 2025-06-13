@@ -153,8 +153,8 @@ Resources:
       Parameters:
         AllowedCidr: !Ref ReactAppAllowedCidr
         VPCId: !If [ CreateNetworking, !GetAtt "Network.Outputs.VPCId" , !Ref ExistingVpcId ]
-        PublicSubnet1: !If [ CreateNetworking, !GetAtt "Network.Outputs.PublicSubnet1" , !Select [ 0, ExistingPublicSubnets ] ]
-        PublicSubnet2: !If [ CreateNetworking, !GetAtt "Network.Outputs.PublicSubnet2" , !Select [ 1, ExistingPublicSubnets ] ]
+        PublicSubnet1: !If [ CreateNetworking, !GetAtt "Network.Outputs.PublicSubnet1" , !Select [ 0, !Ref ExistingPublicSubnets ] ]
+        PublicSubnet2: !If [ CreateNetworking, !GetAtt "Network.Outputs.PublicSubnet2" , !Select [ 1, !Ref ExistingPublicSubnets ] ]
         S3Bucket: !Ref S3Bucket
         S3CodeKey: !GetAtt CodeRepo.Outputs.S3Key
       TimeoutInMinutes: 35
