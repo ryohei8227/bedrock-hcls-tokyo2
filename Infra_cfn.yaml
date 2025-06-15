@@ -64,8 +64,8 @@ Parameters:
 
 Conditions:
   HasVpcId: !Not [!Equals [!Ref ExistingVpcId, ""]]
-  HasTwoPublicSubnets: !Equals [Fn::Length !Ref ExistingPublicSubnets, 2]
-  HasTwoPrivateSubnets: !Equals [Fn::Length !Ref ExistingPrivateSubnets, 2]
+  HasTwoPublicSubnets: !Equals [Fn::Length: !Ref ExistingPublicSubnets, 2]
+  HasTwoPrivateSubnets: !Equals [Fn::Length: !Ref ExistingPrivateSubnets, 2]
   CreateNetworking: !Not [!And [!Condition HasVpcId, !Condition HasTwoPublicSubnets, !Condition HasTwoPrivateSubnets]]
   CreateWebSearchAgent:
     !Not [!Equals [!Ref TavilyApiKey, ""]]
@@ -227,8 +227,8 @@ Resources:
         GitBranch: !Ref GitBranch
         SubAgentS3Bucket: !Ref S3Bucket
         VPC: !If [ CreateNetworking, !GetAtt "Network.Outputs.VPCId" , !Ref ExistingVpcId ]
-        PrivateSubnet1: !If [ CreateNetworking, !GetAtt "Network.Outputs.PrivateSubnet1" , !Select [ 0, ExistingPrivateSubnets ] ]
-        PrivateSubnet2: !If [ CreateNetworking, !GetAtt "Network.Outputs.PrivateSubnet2" , !Select [ 1, ExistingPrivateSubnets ] ]
+        PrivateSubnet1: !If [ CreateNetworking, !GetAtt "Network.Outputs.PrivateSubnet1" , !Select [ 0, !Ref ExistingPrivateSubnets ] ]
+        PrivateSubnet2: !If [ CreateNetworking, !GetAtt "Network.Outputs.PrivateSubnet2" , !Select [ 1, !Ref ExistingPrivateSubnets ] ]
         AgentRole: !GetAtt AgentRole.Arn
       TimeoutInMinutes: 30
       Tags:
