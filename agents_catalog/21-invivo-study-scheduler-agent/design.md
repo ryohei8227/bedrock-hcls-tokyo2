@@ -8,7 +8,7 @@ The In Vivo Study Scheduler Agent is designed to optimize the scheduling of in v
 
 ### Components
 
-1. **Amazon Bedrock Agent**
+1. **Amazon Bedrock**
    - Provides the conversational interface for users
    - Processes natural language requests and extracts study scheduling parameters
    - Invokes the appropriate action group based on user intent
@@ -54,7 +54,7 @@ The optimization will use OR-Tools' constraint solver with the following approac
 
 ## Data Flow
 
-1. User submits study scheduling request via the Bedrock Agent
+1. User submits study scheduling request via the Bedrock
 2. Agent extracts study parameters and invokes the ScheduleOptimizer action group
 3. Lambda function processes the request and runs the optimization algorithm
 4. Optimized schedule is returned to the user with visualizations and metrics

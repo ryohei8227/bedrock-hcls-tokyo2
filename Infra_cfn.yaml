@@ -183,7 +183,7 @@ Resources:
           Value: "hcls-agents-toolkit"
 
   ##################################################################
-  # Amazon Bedrock Agents Service Role
+  # Amazon Bedrock Service Role
   ##################################################################
 
   AgentRole:
@@ -423,4 +423,4 @@ Outputs:
     Description: ALB DNS for the React App
   AgentRole:
     Value: !GetAtt AgentRole.Arn
-    Description: Amazon Bedrock Agents Service Role ARN
+    Description: Amazon Bedrock Service Role ARN

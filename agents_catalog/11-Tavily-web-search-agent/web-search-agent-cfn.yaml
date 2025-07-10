@@ -17,7 +17,7 @@ Parameters:
     Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
-    Description: (Optional) Amazon Bedrock Agents service role ARN
+    Description: (Optional) Amazon Bedrock service role ARN
     Default: ""
   TavilyApiKey:
     Type: String

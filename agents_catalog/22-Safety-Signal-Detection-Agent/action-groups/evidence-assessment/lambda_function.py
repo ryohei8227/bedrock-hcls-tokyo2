@@ -140,7 +140,7 @@ def assess_causality(literature, label_info):
 
 def format_response(evidence):
     """
-    Format the response for Bedrock Agent
+    Format the response for Bedrock
     """
     response_lines = []
     
@@ -181,7 +181,7 @@ def format_response(evidence):
 
 def parse_parameters(event):
     """
-    Parse parameters from Bedrock Agent event
+    Parse parameters from Bedrock event
     """
     logger.info(f"Parsing parameters from event: {json.dumps(event)}")
     

@@ -1,6 +1,6 @@
-# Create a RAG Bedrock Agent
+# Create a RAG Agent
 
-Create a sample end-to-end RAG Bedrock Agent solution.
+Create a sample end-to-end RAG Agent solution.
 
 ## Sample Database Overview
 
@@ -8,7 +8,7 @@ This notebook will walk users through setting up a sample RAG Agent with a sampl
 
 ### RAG Flow
 
-1. User asks questions to the Amazon Bedrock Agent.
+1. User asks questions to the agent.
 2. To serve the user's questions, Agent determines the appropriate action to invoke.
 3. It will invoke the knowledge base to perform RAG and retrieve relevant references
 4. The agent will use the retrieved references to generate a natural language answer.

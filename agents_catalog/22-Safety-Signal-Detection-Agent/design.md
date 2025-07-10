@@ -4,7 +4,7 @@
 
 ### Components
 
-1. **Amazon Bedrock Agent**
+1. **Amazon Bedrock**
    - Handles natural language interactions
    - Routes requests to appropriate action groups
    - Manages conversation context and flow
@@ -32,7 +32,7 @@
 ```mermaid
 sequenceDiagram
     participant User
-    participant Agent as Bedrock Agent
+    participant Agent as Agent
     participant AEA as AdverseEventAnalysis
     participant EA as EvidenceAssessment
     participant RG as ReportGeneration

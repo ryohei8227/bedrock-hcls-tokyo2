@@ -99,7 +99,7 @@ cd agents_catalog/22-Safety-Signal-Detection-Agent
 # Set required environment variables
 export BUCKET_NAME="<YOUR_S3_BUCKET_NAME>"        # S3 bucket for Lambda function code
 export REGION="<YOUR_REGION>"                     # AWS region for deployment
-export BEDROCK_AGENT_SERVICE_ROLE_ARN="<YOUR_BEDROCK_AGENT_ROLE_ARN>"  # IAM role for Bedrock Agent
+export BEDROCK_AGENT_SERVICE_ROLE_ARN="<YOUR_BEDROCK_AGENT_ROLE_ARN>"  # IAM role for Bedrock
 
 # Run the deployment script
 ./deploy.sh
@@ -109,12 +109,12 @@ The script will:
 
 - Package Lambda function code and upload to S3
 - Deploy the CloudFormation stack with all required resources
-- Create the Bedrock Agent with configured action groups
+- Create the agent with configured action groups
 
 Required Resources:
 
 - An S3 bucket in the target region
-- An IAM role for Bedrock Agent with appropriate permissions
+- An IAM role for Bedrock with appropriate permissions
 - AWS CLI configured with credentials having necessary permissions
 
 Note: The CloudFormation template uses relative paths to reference Lambda function code, which is automatically packaged and uploaded to S3 during deployment.

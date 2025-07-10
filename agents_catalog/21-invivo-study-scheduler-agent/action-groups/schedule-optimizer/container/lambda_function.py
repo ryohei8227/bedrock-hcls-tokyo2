@@ -87,6 +87,6 @@ def lambda_handler(event: dict, context: LambdaContext):
         context: Lambda context
         
     Returns:
-        Response formatted for Bedrock Agent
+        Response formatted for Bedrock
     """
     return app.resolve(event, context)

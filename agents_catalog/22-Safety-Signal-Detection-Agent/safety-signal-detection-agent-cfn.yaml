@@ -12,7 +12,7 @@ Parameters:
     Default: us.anthropic.claude-3-5-sonnet-20241022-v2:0
   AgentIAMRoleArn:
     Type: String
-    Description: "Required. The ARN of an IAM role that grants Bedrock Agent permissions to invoke Lambda functions and manage agents"
+    Description: "Required. The ARN of an IAM role that grants Bedrock permissions to invoke Lambda functions and manage agents"
     Default: ""
 Conditions:
   CreateAgentAliasCondition: !Not [!Equals [!Ref AgentAliasName, ""]]

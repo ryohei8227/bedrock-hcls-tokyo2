@@ -195,7 +195,7 @@ def calculate_confidence_interval(count, total):
 
 def format_response(data):
     """
-    Format the response for Bedrock Agent
+    Format the response for Bedrock
     """
     response_lines = []
     
@@ -231,7 +231,7 @@ def format_response(data):
 
 def parse_parameters(event):
     """
-    Parse parameters from Bedrock Agent event
+    Parse parameters from Bedrock event
     """
     logger.info(f"Parsing parameters from event: {json.dumps(event)}")
     
@@ -261,7 +261,7 @@ def parse_parameters(event):
 
 def create_response(event, result):
     """
-    Create a properly formatted response for Bedrock Agent
+    Create a properly formatted response for Bedrock
     """
     return {
         "response": {

@@ -4,7 +4,7 @@ This file provides guidance to coding agents such as Amazon Q Developer or Claud
 
 ## Repository Overview
 
-This is the AWS Healthcare and Life Sciences Agents Toolkit - a collection of specialized Amazon Bedrock agents for drug research, clinical trials, and commercialization workflows. The repository contains three main components:
+This is the AWS Healthcare and Life Sciences Agents Toolkit - a collection of specialized agents running on Amazon Bedrock for drug research, clinical trials, and commercialization workflows. The repository contains three main components:
 
 * **agents_catalog/**: Library of 18+ specialized agents (biomarker analysis, clinical research, pathology, etc.)
 * **multi_agent_collaboration/**: Framework for coordinating multiple agents on complex workflows
@@ -69,10 +69,10 @@ Follow this guidance when developing new agents for this toolkit:
 
 ### CloudFormation Templates
 
-* CloudFormation templates that define a Bedrock Agent should have at least three parameters:
+* CloudFormation templates that define an agent should have at least three parameters:
   * AgentAliasName - Optional alias name. Defaults to "Latest"
   * BedrockModelId - Optional Bedrock foundation model id. Defaults to "us.anthropic.claude-3-5-sonnet-20241022-v2:0"
-  * AgentIAMRoleArn - Optional Bedrock Agent execution role. Defaults to ""
+  * AgentIAMRoleArn - Optional Bedrock execution role. Defaults to ""
 
 ### Lambda Action Groups
 

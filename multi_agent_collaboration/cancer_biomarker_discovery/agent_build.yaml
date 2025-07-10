@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Creates a Bedrock Agent and action group
+Description: Creates an agent and action group
 
 Parameters:
   BedrockModelId:
@@ -1820,7 +1820,7 @@ Resources:
       Name: /bedrock/agent/role/arn
       Type: String
       Value: !Ref AgentRole
-      Description: Amazon Bedrock Agents Service Role ARN
+      Description: Amazon Bedrock Service Role ARN
 
   AgentBuildS3BucketNameSSMParameter:
     Type: AWS::SSM::Parameter

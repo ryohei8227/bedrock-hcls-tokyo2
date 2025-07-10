@@ -66,7 +66,7 @@
 
 ### TR1: AWS Infrastructure
 
-- Amazon Bedrock Agent with Claude 3.5 Sonnet v2 model
+- Amazon Bedrock with Claude 3.5 Sonnet v2 model
 - AWS Lambda functions for action groups
 - CloudFormation template for infrastructure deployment
 - Appropriate IAM roles and policies

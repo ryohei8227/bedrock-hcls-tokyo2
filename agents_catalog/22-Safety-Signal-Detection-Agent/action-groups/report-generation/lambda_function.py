@@ -111,7 +111,7 @@ def upload_to_s3(report_text, bucket_name, product_name):
 
 def parse_parameters(event):
     """
-    Parse parameters from Bedrock Agent event
+    Parse parameters from Bedrock event
     """
     logger.info(f"Parsing parameters from event: {json.dumps(event)}")
     

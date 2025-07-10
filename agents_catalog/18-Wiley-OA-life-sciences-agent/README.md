@@ -86,7 +86,7 @@ To quit the prompt, type "exit"
 ```bash
 INFO: Found credentials in shared credentials file: ~/.aws/credentials
 ========================================================================================
-Welcome to the Amazon Bedrock Agents demo.
+Welcome to the agents demo.
 ========================================================================================
 Let's start with creating an agent:
 ----------------------------------------

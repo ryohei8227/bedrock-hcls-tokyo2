@@ -1,6 +1,6 @@
-# Create a Text2SQL Bedrock Agent
+# Create a Text2SQL Agent
 
-Create an end-to-end Text-to-SQL Bedrock Agent solution, integrated with Amazon Athena using a sample dataset
+Create an end-to-end Text-to-SQL Agent solution, integrated with Amazon Athena using a sample dataset
 
 ### Workflow of the Text2SQL Agent
 
@@ -16,7 +16,7 @@ Create an end-to-end Text-to-SQL Bedrock Agent solution, integrated with Amazon 
 
 ### Agentic Text2Cypher Flow
 
-1. User asks questions to the Amazon Bedrock Agent.
+1. User asks questions to the Agent.
 2. To serve the user's questions, Agent determines the appropriate action to invoke.
 3. It will invoke the lambda function and execute the /getschema action to retrieve the SQL database schema.
 4. The agent will use the retrieved schema to generate an SQL query.a

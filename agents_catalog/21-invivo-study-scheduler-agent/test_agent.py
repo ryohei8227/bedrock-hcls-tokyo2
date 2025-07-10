@@ -11,7 +11,7 @@ from typing import Dict, Any
 def test_invivo_scheduler_agent():
     """Test the In Vivo Study Scheduler Agent with sample data"""
     
-    # Initialize Bedrock Agent Runtime client
+    # Initialize Bedrock Runtime client
     client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
     
     # Agent details from CloudFormation outputs

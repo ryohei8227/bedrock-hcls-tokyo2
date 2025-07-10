@@ -64,7 +64,7 @@
 
 ### TR1: AWS Infrastructure
 
-- Amazon Bedrock Agent with appropriate model
+- Agent with appropriate model
 - AWS Lambda functions for action groups
 - CloudFormation template for infrastructure deployment
 - Required IAM roles and policies
