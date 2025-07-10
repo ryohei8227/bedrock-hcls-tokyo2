@@ -14,7 +14,7 @@ This agent optimizes the scheduling of in vivo studies across a 30-day period, e
 
 The agent leverages a custom container-based Lambda function with optimization libraries:
 
-- **Amazon Bedrock Agent**: Provides conversational interface for study scheduling requests
+- **Amazon Bedrock**: Provides conversational interface for study scheduling requests
 - **Lambda Function with Custom Container**: Implements optimization logic using OR-Tools
 - **Schedule Optimizer Action Group**: Processes study requests and returns optimized schedules
 - **Container Image**: Includes OR-Tools, PuLP, Pyomo, and visualization libraries
@@ -38,7 +38,7 @@ The scheduler uses a multi-objective optimization strategy:
 
 The agent is deployed using AWS CloudFormation with all necessary resources:
 
-- Amazon Bedrock Agent with action groups
+- Amazon Bedrock with action groups
 - Lambda function with custom container image
 - Amazon ECR repository for container storage
 - IAM roles and permissions

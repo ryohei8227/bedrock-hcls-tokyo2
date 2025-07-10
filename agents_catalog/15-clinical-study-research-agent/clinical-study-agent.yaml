@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Creates an Amazon Bedrock Agent for clinical study research and analysis.
+Description: Creates an agent for clinical study research and analysis.
 
 Parameters:
   AgentAliasName:
@@ -11,7 +11,7 @@ Parameters:
     Default: anthropic.claude-3-5-sonnet-20240620-v1:0
   AgentIAMRoleArn:
     Type: String
-    Description: (Optional) Amazon Bedrock Agents service role ARN
+    Description: (Optional) Amazon Bedrock service role ARN
     Default: ""
   ChartImageBucketName:
     Type: String

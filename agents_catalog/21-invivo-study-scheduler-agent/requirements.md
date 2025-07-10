@@ -33,7 +33,7 @@
 ## Technical Requirements
 
 1. **AWS Infrastructure**
-   - Amazon Bedrock agent with appropriate action groups
+   - Amazon Bedrock with appropriate action groups
    - Lambda function using a custom container with OR-Tools
    - CloudFormation template for deployment
 

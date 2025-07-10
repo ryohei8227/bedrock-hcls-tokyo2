@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Creates an Amazon Bedrock Agent for analyzing medical reports using one or more language models from John Snow Laboratories.
+Description: Creates an agent for analyzing medical reports using one or more language models from John Snow Laboratories.
 Parameters:
   AgentAliasName:
     Type: String

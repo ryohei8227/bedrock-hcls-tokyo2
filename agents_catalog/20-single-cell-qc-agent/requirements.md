@@ -1,7 +1,7 @@
 # Requirements for Single Cell QC Analysis Agent
 
 ## Purpose
-Create an Amazon Bedrock agent that can analyze and validate quality control metrics for single cell gene expression assays by comparing web summary files against technical interpretation guidelines.
+Create an agent that can analyze and validate quality control metrics for single cell gene expression assays by comparing web summary files against technical interpretation guidelines.
 
 ## Functional Requirements
 

@@ -14,11 +14,11 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     Lambda handler for UniProt protein details retrieval.
 
     Args:
-        event: Lambda event containing parameters from Bedrock Agent
+        event: Lambda event containing parameters from Bedrock
         context: Lambda context object
 
     Returns:
-        Formatted response for Bedrock Agent
+        Formatted response for Bedrock
     """
     try:
         logger.info(f"Received event: {json.dumps(event)}")
@@ -337,10 +337,10 @@ def format_sequence(sequence: str) -> str:
 
 def create_response(event: Dict[str, Any], result: str) -> Dict[str, Any]:
     """
-    Create a properly formatted response for Bedrock Agent.
+    Create a properly formatted response for Bedrock.
 
     Args:
-        event: Original event from Bedrock Agent
+        event: Original event from Bedrock
         result: Result string to return
 
     Returns:

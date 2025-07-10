@@ -4,14 +4,14 @@
 
 The UniProt Protein Search Agent follows the standard AWS Healthcare and Life Sciences Agent Toolkit pattern with:
 
-- **Amazon Bedrock Agent**: Core conversational AI using Claude 3.5 Sonnet v2
+- **Amazon Bedrock Model**: Core conversational AI using Claude 3.5 Sonnet v2
 - **Action Groups**: Lambda functions that interface with UniProt APIs
 - **CloudFormation Template**: Infrastructure as Code for deployment
 - **IAM Roles**: Secure access management
 
 ## Component Design
 
-### 1. Bedrock Agent Configuration
+### 1. Bedrock Configuration
 
 **Model**: `anthropic.claude-3-5-sonnet-20241022-v2:0` (Claude 3.5 Sonnet v2)
 
@@ -85,7 +85,7 @@ The UniProt Protein Search Agent follows the standard AWS Healthcare and Life Sc
 
 ### Search Flow
 1. User asks about proteins (e.g., "proteins associated with diabetes")
-2. Bedrock Agent processes natural language query
+2. Bedrock processes natural language query
 3. Agent calls `search_proteins` action with appropriate search terms
 4. Lambda function constructs UniProt API query
 5. UniProt API returns search results
@@ -198,9 +198,9 @@ Parameters:
 - `AWS::Logs::LogGroup`: CloudWatch log groups
 
 ### Parameters
-- `AgentName`: Name for the Bedrock agent
+- `AgentName`: Name for the agent
 - `AgentAliasName`: Alias name (default: "Latest")
-- `AgentIAMRoleArn`: IAM role for Bedrock agent
+- `AgentIAMRoleArn`: IAM role for Bedrock
 - `S3CodeBucket`: S3 bucket for Lambda code storage
 
 ## Future Enhancements

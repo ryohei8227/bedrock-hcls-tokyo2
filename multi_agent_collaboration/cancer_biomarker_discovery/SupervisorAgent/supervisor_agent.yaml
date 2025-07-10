@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation template for Bedrock Agent deployment using custom resource'
+Description: 'CloudFormation template for agent deployment using custom resource'
 
 Parameters:
   EnvironmentName:
@@ -316,7 +316,7 @@ Resources:
 
 Outputs:
   AgentId:
-    Description: Bedrock Agent ID
+    Description: Agent ID
     Value: !GetAtt BedrockAgentCustomResource.AgentId
   SupervisorAliasId:
     Description: Supervisor Agent Alias ID

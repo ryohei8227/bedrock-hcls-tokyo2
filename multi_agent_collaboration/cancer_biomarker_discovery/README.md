@@ -1,4 +1,4 @@
-# Accelerate analysis and discovery of cancer biomarkers with Bedrock Agents
+# Accelerate analysis and discovery of cancer biomarkers with Bedrock
 
 Read more about these agents here: https://aws.amazon.com/blogs/machine-learning/accelerate-analysis-and-discovery-of-cancer-biomarkers-with-amazon-bedrock-agents/
 
@@ -18,7 +18,7 @@ The biomarker analysis workflow is illustrated below that incorporates multimoda
 The multi-agent solution architecture is illustrated below. 
 ![architecture](images/MultiAgentBiomarkers.png)
 
-Amazon Bedrock Agents enable generative AI applications to execute multistep tasks across company systems and data sources. We define our solution to include planning and reasoning with multiple agents. 
+Amazon Bedrock enables generative AI applications to execute multistep tasks across company systems and data sources. We define our solution to include planning and reasoning with multiple agents. 
 
     Biomarker database analyst : Convert natural language questions to SQL statements and execute on an Amazon Redshift database of biomarkers.
     Statistician: Use a custom container with lifelines library to build survival regression models and visualization such as Kaplan Meier charts for survival analysis.

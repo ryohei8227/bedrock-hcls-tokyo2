@@ -1,6 +1,6 @@
-# Create a Bedrock Agent with your own tools
+# Create an Agent with your own tools
 
-Bring your tools to Bedrock Agents
+Bring your tools to Bedrock
 
 ## Examples Overview 
 1. [Create Agents with Function Definition](https://github.com/aws-samples/amazon-bedrock-samples/tree/main/agents-and-function-calling/bedrock-agents/features-examples/01-create-agent-with-function-definition)

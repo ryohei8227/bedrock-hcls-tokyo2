@@ -10,7 +10,7 @@ Parameters:
     Default: us.anthropic.claude-3-5-sonnet-20240620-v1:0
   AgentIAMRoleArn:
     Type: String
-    Description: (Optional) Amazon Bedrock Agents service role ARN
+    Description: (Optional) Amazon Bedrock service role ARN
     Default: ""
   ClinicalStudySearchAgentAliasArn:
     Description: Alias ARN for the clinical study search sub-agent

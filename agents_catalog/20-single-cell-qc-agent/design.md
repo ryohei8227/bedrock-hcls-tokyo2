@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-The Single Cell QC Analysis Agent will be implemented as an Amazon Bedrock agent with two primary action groups:
+The Single Cell QC Analysis Agent will be implemented as an agent with two primary action groups:
 
 1. **WebSummaryAnalyzer**: Retrieves and analyzes web summary files from S3
 2. **QCValidator**: Validates metrics against technical guidelines
@@ -12,7 +12,7 @@ The agent will use AWS Lambda functions to implement these action groups, with A
 ## Component Design
 
 ### CloudFormation Template
-- Defines the Bedrock agent and its configuration
+- Defines the agent and its configuration
 - Creates Lambda functions for action groups
 - Sets up IAM roles with appropriate permissions
 - Configures necessary CloudWatch logs

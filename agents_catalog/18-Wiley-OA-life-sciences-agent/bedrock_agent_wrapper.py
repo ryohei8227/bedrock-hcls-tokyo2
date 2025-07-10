@@ -5,7 +5,7 @@
 Purpose
 
 Shows how to use the AWS SDK for Python (Boto3) with Amazon Bedrock to manage
-Bedrock Agents.
+Bedrock.
 """
 
 import logging
@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 # snippet-start:[python.example_code.bedrock-agent.BedrockAgentWrapper.class]
 # snippet-start:[python.example_code.bedrock-agent.BedrockAgentWrapper.decl]
 class BedrockAgentWrapper:
-    """Encapsulates Amazon Bedrock Agent actions."""
+    """Encapsulates Amazon Bedrock actions."""
 
     def __init__(self, client):
         """
-        :param client: A Boto3 Amazon Bedrock Agents client, which is a low-level client that
-                       represents Amazon Bedrock Agents and describes the API operations
-                       for creating and managing Bedrock Agent resources.
+        :param client: A Boto3 Amazon Bedrock client, which is a low-level client that
+                       represents Amazon Bedrock and describes the API operations
+                       for creating and managing Bedrock resources.
         """
         self.client = client
 
@@ -41,7 +41,7 @@ class BedrockAgentWrapper:
         :param role_arn: The ARN of the IAM role with permissions needed by the agent.
         :param instruction: Instructions that tell the agent what it should do and how it should
                             interact with users.
-        :return: The response from Amazon Bedrock Agents if successful, otherwise raises an exception.
+        :return: The response from Amazon Bedrock if successful, otherwise raises an exception.
         """
         try:
             response = self.client.create_agent(
@@ -118,10 +118,10 @@ class BedrockAgentWrapper:
     # snippet-start:[python.example_code.bedrock-agent.DeleteAgent]
     def delete_agent(self, agent_id):
         """
-        Deletes an Amazon Bedrock agent.
+        Deletes an agent.
 
         :param agent_id: The unique identifier of the agent to delete.
-        :return: The response from Amazon Bedrock Agents if successful, otherwise raises an exception.
+        :return: The response from Amazon Bedrock if successful, otherwise raises an exception.
         """
 
         try:
@@ -139,11 +139,11 @@ class BedrockAgentWrapper:
     # snippet-start:[python.example_code.bedrock-agent.DeleteAgentAlias]
     def delete_agent_alias(self, agent_id, agent_alias_id):
         """
-        Deletes an alias of an Amazon Bedrock agent.
+        Deletes an agent alias.
 
         :param agent_id: The unique identifier of the agent that the alias belongs to.
         :param agent_alias_id: The unique identifier of the alias to delete.
-        :return: The response from Amazon Bedrock Agents if successful, otherwise raises an exception.
+        :return: The response from Amazon Bedrock if successful, otherwise raises an exception.
         """
 
         try:
@@ -185,9 +185,9 @@ class BedrockAgentWrapper:
     # snippet-start:[python.example_code.bedrock-agent.ListAgents]
     def list_agents(self):
         """
-        List the available Amazon Bedrock Agents.
+        List the available agents.
 
-        :return: The list of available bedrock agents.
+        :return: The list of available agents.
         """
 
         try:
@@ -208,7 +208,7 @@ class BedrockAgentWrapper:
     # snippet-start:[python.example_code.bedrock-agent.ListAgentActionGroups]
     def list_agent_action_groups(self, agent_id, agent_version):
         """
-        List the action groups for a version of an Amazon Bedrock Agent.
+        List the action groups for an agent version.
 
         :param agent_id: The unique identifier of the agent.
         :param agent_version: The version of the agent.
@@ -237,7 +237,7 @@ class BedrockAgentWrapper:
     # snippet-start:[python.example_code.bedrock-agent.ListAgentKnowledgeBases]
     def list_agent_knowledge_bases(self, agent_id, agent_version):
         """
-        List the knowledge bases associated with a version of an Amazon Bedrock Agent.
+        List the knowledge bases associated with an agent version.
 
         :param agent_id: The unique identifier of the agent.
         :param agent_version: The version of the agent.
@@ -269,7 +269,7 @@ class BedrockAgentWrapper:
         Creates a DRAFT version of the agent that can be used for internal testing.
 
         :param agent_id: The unique identifier of the agent to prepare.
-        :return: The response from Amazon Bedrock Agents if successful, otherwise raises an exception.
+        :return: The response from Amazon Bedrock if successful, otherwise raises an exception.
         """
         try:
             prepared_agent_details = self.client.prepare_agent(agentId=agent_id)

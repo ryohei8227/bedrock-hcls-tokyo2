@@ -147,7 +147,7 @@ export async function GET() {
 
       return NextResponse.json(validAgents);
     } catch (error) {
-      console.error("Error fetching Bedrock agents:", error);
+      console.error("Error fetching agents:", error);
       return NextResponse.json({ error: "Failed to fetch agents" }, { status: 500 });
     }
 }
