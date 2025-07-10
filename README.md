@@ -124,7 +124,7 @@ Read more about sample agents to accelerate analysis and discovery of cancer bio
 
 The multi-agent solution overview of [Cancer biomarker discovery](multi_agent_collaboration/cancer_biomarker_discovery/README.md) is illustrated below.
 
-![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.jpg)
+![architecture](multi_agent_collaboration/cancer_biomarker_discovery/images/architecture.png)
 
 ## Model Context Protocol (MCP)
 
