@@ -25,7 +25,7 @@ Parameters:
     Type: String
     Description: The link to the agent build cloudformation stack
 #    Default: https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences.git
-    Default:https://github.com/ryohei8227/bedrock-hcls-tokyo2
+    Default: https://github.com/ryohei8227/bedrock-hcls-tokyo2
   GitBranch:
     Type: String
     Description: The github branch to clone
