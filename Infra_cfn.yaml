@@ -1,5 +1,4 @@
 Transform: AWS::LanguageExtensions
-
 Parameters:
   BedrockModelId:
     Type: String
@@ -14,15 +13,19 @@ Parameters:
   RedshiftPassword:
     Type: String
     NoEcho: true
-    Description: STORE SECURELY - The password for the Redshift master user. Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.
+    Description: STORE SECURELY - The password for the Redshift master user. Must
+      be at least 8 characters long and contain at least one uppercase letter, one
+      lowercase letter, and one number.
     MinLength: 8
     MaxLength: 64
-    AllowedPattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};:'",.<>?]{8,64}$
-    ConstraintDescription: Password must be between 8 and 64 characters, and contain at least one uppercase letter, one lowercase letter, and one number.
+    AllowedPattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+\-=\[\]{};:',.<>?]{8,64}$
+    ConstraintDescription: Password must be between 8 and 64 characters, and contain
+      at least one uppercase letter, one lowercase letter, and one number.
   GithubLink:
     Type: String
     Description: The link to the agent build cloudformation stack
-    Default: https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences.git
+#    Default: https://github.com/aws-samples/amazon-bedrock-agents-healthcare-lifesciences.git
+    Default:https://github.com/ryohei8227/bedrock-hcls-tokyo2
   GitBranch:
     Type: String
     Description: The github branch to clone
@@ -36,156 +39,179 @@ Parameters:
     Type: String
     NoEcho: true
     Description: Provide TavilyApiKey API Key to utilize /web_search path
-    Default: 
+    Default: ''
   USPTOApiKey:
     Type: String
     NoEcho: true
     Description: Provide USPTO API Key to utilize /search path
-    Default: 
+    Default: ''
   DeployApplication:
     Type: String
-    Description: Select true to deploy the react application and agents. Select false to only build the agents.
-    Default: true
+    Description: Select true to deploy the react application and agents. Select false
+      to only build the agents.
+    Default: 'true'
     AllowedValues:
-      - true
-      - false
+    - 'true'
+    - 'false'
   ExistingVpcId:
     Type: String
     Description: The VPC ID of an existing VPC in your AWS account and current region
-    Default: 
+    Default: ''
   ExistingPublicSubnets:
     Type: CommaDelimitedList
-    Description: A list of 2 public subnet IDs in your AWS account and AWS region from two different AZs are required.
-    Default: 
+    Description: A list of 2 public subnet IDs in your AWS account and AWS region
+      from two different AZs are required.
+    Default: ''
   ExistingPrivateSubnets:
     Type: CommaDelimitedList
-    Description: A list of 2 private subnet IDs in your AWS account and AWS region from two different AZs are required.
-    Default: 
-
+    Description: A list of 2 private subnet IDs in your AWS account and AWS region
+      from two different AZs are required.
+    Default: ''
 Conditions:
-  HasVpcId: !Not [!Equals [!Ref ExistingVpcId, ]]
-  HasTwoPublicSubnets: !Equals [Fn::Length: !Ref ExistingPublicSubnets, 2]
-  HasTwoPrivateSubnets: !Equals [Fn::Length: !Ref ExistingPrivateSubnets, 2]
+  HasVpcId:
+    Fn::Not:
+    - Fn::Equals:
+      - Ref: ExistingVpcId
+      - ''
+  HasTwoPublicSubnets:
+    Fn::Equals:
+    - Fn::Length:
+        Ref: ExistingPublicSubnets
+    - 2
+  HasTwoPrivateSubnets:
+    Fn::Equals:
+    - Fn::Length:
+        Ref: ExistingPrivateSubnets
+    - 2
   CreateNetworking:
-    !Not [
-      !And [
-        !Condition HasVpcId,
-        !Condition HasTwoPublicSubnets,
-        !Condition HasTwoPrivateSubnets,
-      ],
-    ]
-  CreateWebSearchAgent: !Not [!Equals [!Ref TavilyApiKey, ]]
-  CreateUSPTOSearchAgent: !Not [!Equals [!Ref USPTOApiKey, ]]
+    Fn::Not:
+    - Fn::And:
+      - Condition: HasVpcId
+      - Condition: HasTwoPublicSubnets
+      - Condition: HasTwoPrivateSubnets
+  CreateWebSearchAgent:
+    Fn::Not:
+    - Fn::Equals:
+      - Ref: TavilyApiKey
+      - ''
+  CreateUSPTOSearchAgent:
+    Fn::Not:
+    - Fn::Equals:
+      - Ref: USPTOApiKey
+      - ''
   CreateCompetitiveIntelAgent:
-    !Not [!Or [!Equals [!Ref TavilyApiKey, ], !Equals [!Ref USPTOApiKey, ]]]
-  CreateReactApp: !Equals [!Ref DeployApplication, true]
-
+    Fn::Not:
+    - Fn::Or:
+      - Fn::Equals:
+        - Ref: TavilyApiKey
+        - ''
+      - Fn::Equals:
+        - Ref: USPTOApiKey
+        - ''
+  CreateReactApp:
+    Fn::Equals:
+    - Ref: DeployApplication
+    - 'true'
 Resources:
-  ##################################################################
-  # VPC
-  ##################################################################
-
   Network:
     Type: AWS::CloudFormation::Stack
     Condition: CreateNetworking
     Properties:
-      TemplateURL: build/network.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/174761e6ec37f9ace19343a5392f20d6.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/network.yaml
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  ##################################################################
-  # S3
-  ##################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
+      BucketName:
+        Fn::Sub: ${AWS::StackName}-${AWS::AccountId}-${AWS::Region}
       BucketEncryption:
         ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: AES256
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  ##################################################################
-  # Copy code repo to S3
-  ##################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   CodeRepo:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: build/copy_github_repo.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/a7ffd71a1d34ef907116046aec1265c2.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/copy_github_repo.yaml
       Parameters:
-        GitHubUrl: !Ref GithubLink
-        BranchName: !Ref GitBranch
-        S3Bucket: !Ref S3Bucket
+        GitHubUrl:
+          Ref: GithubLink
+        BranchName:
+          Ref: GitBranch
+        S3Bucket:
+          Ref: S3Bucket
         S3KeyPrefix: repo
       TimeoutInMinutes: 5
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  ###############################################################################
-  # Custom Resources to Package Agent Templates - May not be needed in the future
-  ###############################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   CodeBuild:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: build/codebuild.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/fe306cb347982104148bc6df54895d7a.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/codebuild.yaml
       Parameters:
-        GithubLink: !Ref GithubLink
-        GitBranch: !Ref GitBranch
-        S3Bucket: !Ref S3Bucket
+        GithubLink:
+          Ref: GithubLink
+        GitBranch:
+          Ref: GitBranch
+        S3Bucket:
+          Ref: S3Bucket
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  ##################################################################
-  # React Application
-  ##################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   ReactAppEcsBuildNestedStack:
     Type: AWS::CloudFormation::Stack
     Condition: CreateReactApp
     Properties:
-      TemplateURL: ui/cloudformation/ecs.yml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/609efe214bcc7e9d92c3b01ae2e4601a.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/ecs.yml
       Parameters:
-        AllowedCidr: !Ref ReactAppAllowedCidr
+        AllowedCidr:
+          Ref: ReactAppAllowedCidr
         VPCId:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.VPC,
-            !Ref ExistingVpcId,
-          ]
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.VPC
+          - Ref: ExistingVpcId
         PublicSubnet1:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.PublicSubnet1,
-            !Select [0, !Ref ExistingPublicSubnets],
-          ]
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.PublicSubnet1
+          - Fn::Select:
+            - 0
+            - Ref: ExistingPublicSubnets
         PublicSubnet2:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.PublicSubnet2,
-            !Select [1, !Ref ExistingPublicSubnets],
-          ]
-        S3Bucket: !Ref S3Bucket
-        S3CodeKey: !GetAtt CodeRepo.Outputs.S3Key
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.PublicSubnet2
+          - Fn::Select:
+            - 1
+            - Ref: ExistingPublicSubnets
+        S3Bucket:
+          Ref: S3Bucket
+        S3CodeKey:
+          Fn::GetAtt:
+          - CodeRepo
+          - Outputs.S3Key
       TimeoutInMinutes: 35
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  ##################################################################
-  # Amazon Bedrock Service Role
-  ##################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   AgentRole:
     Type: AWS::IAM::Role
     DeletionPolicy: Retain
@@ -194,233 +220,302 @@ Resources:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - bedrock.amazonaws.com
-            Action:
-              - sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service:
+            - bedrock.amazonaws.com
+          Action:
+          - sts:AssumeRole
       Policies:
-        - PolicyName: BedrockInvokeModel
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - bedrock:*
-                Resource:
-                  - !Sub arn:${AWS::Partition}:bedrock:*::foundation-model/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent-alias/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:application-inference-profile/*
-                  - !Sub arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail/*
+      - PolicyName: BedrockInvokeModel
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - bedrock:*
+            Resource:
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:*::foundation-model/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:knowledge-base/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent-alias/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:application-inference-profile/*
+            - Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:guardrail/*
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-  #################################################################################################################################################
-  #################################################################################################################################################
-  ##    _                _      ___      _        _
-  ##   /_\  __ _ ___ _ _| |_   / __|__ _| |_ __ _| |___  __ _
-  ##  / _ \/ _` / -_) ' \  _| | (__/ _` |  _/ _` | / _ \/ _` |
-  ## /_/ \_\__, \___|_||_\__|  \___\__,_|\__\__,_|_\___/\__, |
-  ##       |___/                                        |___/
-  #################################################################################################################################################
-  #################################################################################################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   BiomarkerDiscoverySupervisorAgent:
     Type: AWS::CloudFormation::Stack
     DependsOn:
-      - CodeBuild
+    - CodeBuild
     Properties:
-      TemplateURL: multi_agent_collaboration/cancer_biomarker_discovery/agent_build.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/6b8370945095ffacbf6fcfa0dc321ad9.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/agent_build.yaml
       Parameters:
-        BedrockModelId: !Ref BedrockModelId
-        RedshiftDatabaseName: !Ref RedshiftDatabaseName
-        RedshiftUserName: !Ref RedshiftUserName
-        RedshiftPassword: !Ref RedshiftPassword
-        MultiAgentDevMode: false
+        BedrockModelId:
+          Ref: BedrockModelId
+        RedshiftDatabaseName:
+          Ref: RedshiftDatabaseName
+        RedshiftUserName:
+          Ref: RedshiftUserName
+        RedshiftPassword:
+          Ref: RedshiftPassword
+        MultiAgentDevMode: 'false'
         EnvironmentName: env1
-        GitRepoURL: !Ref GithubLink
-        GitBranch: !Ref GitBranch
-        SubAgentS3Bucket: !Ref S3Bucket
+        GitRepoURL:
+          Ref: GithubLink
+        GitBranch:
+          Ref: GitBranch
+        SubAgentS3Bucket:
+          Ref: S3Bucket
         VPC:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.VPC,
-            !Ref ExistingVpcId,
-          ]
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.VPC
+          - Ref: ExistingVpcId
         PrivateSubnet1:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.PrivateSubnet1,
-            !Select [0, !Ref ExistingPrivateSubnets],
-          ]
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.PrivateSubnet1
+          - Fn::Select:
+            - 0
+            - Ref: ExistingPrivateSubnets
         PrivateSubnet2:
-          !If [
-            CreateNetworking,
-            !GetAtt Network.Outputs.PrivateSubnet2,
-            !Select [1, !Ref ExistingPrivateSubnets],
-          ]
-        AgentRole: !GetAtt AgentRole.Arn
+          Fn::If:
+          - CreateNetworking
+          - Fn::GetAtt:
+            - Network
+            - Outputs.PrivateSubnet2
+          - Fn::Select:
+            - 1
+            - Ref: ExistingPrivateSubnets
+        AgentRole:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
       TimeoutInMinutes: 30
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   ClinicalStudySearchAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/15-clinical-study-research-agent/clinical-study-agent.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/abe0daf8ada1aa989a47c772388c5e7f.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/clinical-study-agent.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        ChartImageBucketName: !Ref S3Bucket
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        ChartImageBucketName:
+          Ref: S3Bucket
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   ClinicalTrialProtocolGeneratorAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/16-Clinical-trial-protocol-generator-agent/clinical-trial-protocol-generator-agent.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/389b8d3f093e0f258e3b9f0b603f9a40.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/clinical-trial-protocol-generator-agent.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   ClinicalTrialProtocolSupervisorAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: multi_agent_collaboration/Clinical-Trial-Protocol-Assistant/clinical-trial-protocol-assistant-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/94a2543f927b510ad67166f4ed7ed312.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/clinical-trial-protocol-assistant-cfn.yaml
       Parameters:
-        BedrockModelId: !Ref BedrockModelId
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        ClinicalStudySearchAgentAliasArn: !GetAtt ClinicalStudySearchAgent.Outputs.AgentAliasArn
-        ClinicalTrialProtocolGeneratorAgentAliasArn: !GetAtt ClinicalTrialProtocolGeneratorAgent.Outputs.AgentAliasArn
+        BedrockModelId:
+          Ref: BedrockModelId
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        ClinicalStudySearchAgentAliasArn:
+          Fn::GetAtt:
+          - ClinicalStudySearchAgent
+          - Outputs.AgentAliasArn
+        ClinicalTrialProtocolGeneratorAgentAliasArn:
+          Fn::GetAtt:
+          - ClinicalTrialProtocolGeneratorAgent
+          - Outputs.AgentAliasArn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   WebSearchAgent:
     Type: AWS::CloudFormation::Stack
     Condition: CreateWebSearchAgent
     Properties:
-      TemplateURL: agents_catalog/11-Tavily-web-search-agent/web-search-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/80a6cd96294a209cbc4746fb80628c2c.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/web-search-agent-cfn.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        TavilyApiKey: !Ref TavilyApiKey
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        TavilyApiKey:
+          Ref: TavilyApiKey
       TimeoutInMinutes: 35
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   SEC10kAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/10-SEC-10-K-agent/sec-10-K-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/7a62004a2707e01c502d79092e75454a.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/sec-10-K-agent-cfn.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        S3CodeBucket: !Ref S3Bucket
-        S3CodeKey: !GetAtt CodeRepo.Outputs.S3Key
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        S3CodeBucket:
+          Ref: S3Bucket
+        S3CodeKey:
+          Fn::GetAtt:
+          - CodeRepo
+          - Outputs.S3Key
       TimeoutInMinutes: 35
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   USPTOSearchAgent:
     Type: AWS::CloudFormation::Stack
     Condition: CreateUSPTOSearchAgent
     Properties:
-      TemplateURL: agents_catalog/14-USPTO-search/uspto-search-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/e76b13a0ccc89b3088e35ab5d0157331.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/uspto-search-agent-cfn.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        USPTOApiKey: !Ref USPTOApiKey
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        USPTOApiKey:
+          Ref: USPTOApiKey
       TimeoutInMinutes: 35
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   CompetitiveIntelligenceSupervisorAgent:
     Type: AWS::CloudFormation::Stack
     Condition: CreateCompetitiveIntelAgent
     Properties:
-      TemplateURL: multi_agent_collaboration/competitive_intelligence/competitive-intelligence-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/b44ab7702726c27ef814dce18bd2d2f0.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/competitive-intelligence-agent-cfn.yaml
       Parameters:
-        BedrockModelId: !Ref BedrockModelId
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        WebSearchAgentAliasArn: !GetAtt WebSearchAgent.Outputs.AgentAliasArn
-        SEC10kAgentAliasArn: !GetAtt SEC10kAgent.Outputs.AgentAliasArn
-        USPTOSearchAgentAliasArn: !GetAtt USPTOSearchAgent.Outputs.AgentAliasArn
+        BedrockModelId:
+          Ref: BedrockModelId
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        WebSearchAgentAliasArn:
+          Fn::GetAtt:
+          - WebSearchAgent
+          - Outputs.AgentAliasArn
+        SEC10kAgentAliasArn:
+          Fn::GetAtt:
+          - SEC10kAgent
+          - Outputs.AgentAliasArn
+        USPTOSearchAgentAliasArn:
+          Fn::GetAtt:
+          - USPTOSearchAgent
+          - Outputs.AgentAliasArn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   WileyOnlineSearchAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/18-Wiley-OA-life-sciences-agent/wiley-search-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/7b1feaa29c7ed71f6e3aabb54821524e.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/wiley-search-agent-cfn.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   UniProtProteinSearchAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/19-UniProt-protein-search-agent/uniprot-protein-search-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/c2e1a494e267ea50a56f85c3afc88e1c.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/uniprot-protein-search-agent-cfn.yaml
       Parameters:
-        BedrockModelId: !Ref BedrockModelId
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
+        BedrockModelId:
+          Ref: BedrockModelId
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   InvivoStudySchedulerAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/21-invivo-study-scheduler-agent/invivo-study-scheduler-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/0f85b3262aad846a798352048519b634.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/invivo-study-scheduler-agent-cfn.yaml
       Parameters:
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
-        S3CodeBucket: !Ref S3Bucket
-        S3CodeKey: !GetAtt CodeRepo.Outputs.S3Key
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
+        S3CodeBucket:
+          Ref: S3Bucket
+        S3CodeKey:
+          Fn::GetAtt:
+          - CodeRepo
+          - Outputs.S3Key
       TimeoutInMinutes: 35
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
+      - Key: Project
+        Value: hcls-agents-toolkit
   SafetySignalDetectionAgent:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: agents_catalog/22-Safety-Signal-Detection-Agent/safety-signal-detection-agent-cfn.yaml
+#      TemplateURL: https://s3.us-east-1.amazonaws.com/5d1a4b76751b4c8a994ce96bafd91ec9-us-east-1/public_assets_support_materials/hcls_agents_toolkit/7a360b4c9a6850b2f78847caaab63966.template
+      TemplateURL: https://bedrock-hcls-templates-ryohei.s3.ap-northeast-1.amazonaws.com/templates/safety-signal-detection-agent-cfn.yaml
       Parameters:
-        BedrockModelId: !Ref BedrockModelId
-        AgentIAMRoleArn: !GetAtt AgentRole.Arn
+        BedrockModelId:
+          Ref: BedrockModelId
+        AgentIAMRoleArn:
+          Fn::GetAtt:
+          - AgentRole
+          - Arn
       TimeoutInMinutes: 10
       Tags:
-        - Key: Project
-          Value: hcls-agents-toolkit
-
-#################################################################################################################################################
-#################################################################################################################################################
-
+      - Key: Project
+        Value: hcls-agents-toolkit
 Outputs:
   ReactAppExternalURL:
     Condition: CreateReactApp
     Value:
       Fn::GetAtt:
-        - ReactAppEcsBuildNestedStack
-        - Outputs.ExternalUrl
+      - ReactAppEcsBuildNestedStack
+      - Outputs.ExternalUrl
     Description: ALB DNS for the React App
   AgentRole:
-    Value: !GetAtt AgentRole.Arn
+    Value:
+      Fn::GetAtt:
+      - AgentRole
+      - Arn
     Description: Amazon Bedrock Service Role ARN
